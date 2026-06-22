@@ -1,10 +1,18 @@
 [
   {
+    "id": "id1782112668893hpqgm65ycie",
+    "emp_id": "emp001",
+    "emp_name": "è¥¿æµ¦",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-06-22 07:17:48"
+  },
+  {
     "id": "id17821126626610jjwiktg08kk",
     "emp_id": "emp001",
     "emp_name": "",
     "action": "SETUP_PASSWORD",
-    "detail": "初回パスワード設定",
+    "detail": "ååãã¹ã¯ã¼ãè¨­å®",
     "created_at": "2026-06-22 07:17:42"
   },
   {
@@ -13,7 +21,7 @@
     "emp_name": "system",
     "action": "SETUP_PASSWORD",
     "target": "auth",
-    "detail": "ååãã¹ã¯ã¼ãè¨­å®",
+    "detail": "Ã¥ÂÂÃ¥ÂÂÃ£ÂÂÃ£ÂÂ¹Ã£ÂÂ¯Ã£ÂÂ¼Ã£ÂÂÃ¨Â¨Â­Ã¥Â®Â",
     "ip": "114.160.52.96",
     "created_at": "2026-06-22 06:00:48"
   }
