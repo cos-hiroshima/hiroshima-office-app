@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>広島オフィス 管理システム</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1a2744;--navy2:#243360;--blue:#2e6da4;--blue2:#4a8fc2;
+  --sky:#d6eaf8;--sky2:#eaf4fb;--green:#27ae60;--green2:#d5f5e3;
+  --amber:#e67e22;--amber2:#fdebd0;--red:#c0392b;--red2:#fde8e6;
+  --gray:#7f8c8d;--gray2:#ecf0f1;--white:#fff;
+  --text:#2c3e50;--text2:#5d6d7e;--border:#d5dde5;
+  --shadow:0 2px 8px rgba(26,39,68,.10);--radius:8px;
+  --font:'Hiragino Sans','Meiryo','Yu Gothic UI',sans-serif;
+}
+html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3f8}
+
+/* ログイン */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 50%,#1a4a6e 100%)}
+.login-box{background:#fff;border-radius:12px;padding:36px 40px;width:380px;max-width:95vw;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo .logo-icon{font-size:36px;display:block;margin-bottom:8px}
+.login-logo h1{font-size:17px;font-weight:700;color:var(--navy)}
+.login-logo p{font-size:12px;color:var(--gray);margin-top:3px}
+.login-step{display:none}.login-step.active{display:block}
+.login-info-box{background:var(--sky2);border:1px solid var(--sky);border-radius:6px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--navy)}
+
+/* アプリ */
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:220px;min-width:220px;background:var(--navy);display:flex;flex-direction:column;box-shadow:2px 0 8px rgba(0,0,0,.18);z-index:100}
+.sidebar-logo{padding:16px 18px 14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo .logo-t{color:#fff;font-size:13px;font-weight:700}
+.sidebar-logo .logo-s{color:rgba(255,255,255,.45);font-size:11px;margin-top:2px}
+.nav-section{padding:8px 0 2px}
+.nav-sec-label{padding:4px 18px;font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;color:rgba(255,255,255,.75);font-size:13px;font-weight:500;border-left:3px solid transparent;transition:all .15s}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:rgba(46,109,164,.35);color:#fff;border-left-color:var(--blue2)}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;border-radius:10px;padding:1px 6px;font-weight:700}
+.sidebar-user{margin-top:auto;padding:12px 18px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:rgba(255,255,255,.6)}
+.sidebar-user strong{color:#fff;display:block;font-size:13px;margin-bottom:2px}
+.btn-logout{margin-top:6px;width:100%;padding:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.7);border-radius:5px;cursor:pointer;font-size:12px;font-family:var(--font);transition:all .15s}
+.btn-logout:hover{background:rgba(255,255,255,.1);color:#fff}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{height:50px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.topbar-title{font-size:15px;font-weight:700;color:var(--navy)}
+.topbar-sub{font-size:12px;color:var(--gray);margin-left:10px}
+#content{flex:1;overflow-y:auto;padding:18px 22px}
+.page{display:none}.page.active{display:block}
+
+/* カード */
+.card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:14px}
+.card-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-header h3{font-size:14px;font-weight:700;color:var(--navy)}
+.card-header .hdr-actions{margin-left:auto;display:flex;gap:6px}
+.card-body{padding:14px 16px}
+
+/* ボタン */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:var(--font)}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--navy2)}
+.btn-secondary{background:var(--gray2);color:var(--text)}.btn-secondary:hover{background:#dde1e4}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#a93226}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:#219a52}
+.btn-block{width:100%;justify-content:center;padding:10px}
+.btn-sm{padding:4px 10px;font-size:11px}
+
+/* バッジ */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-high{background:var(--red2);color:var(--red)}
+.badge-mid{background:var(--amber2);color:var(--amber)}
+.badge-low{background:var(--green2);color:var(--green)}
+.badge-blue{background:var(--sky);color:var(--blue)}
+.badge-gray{background:var(--gray2);color:var(--gray)}
+.badge-green{background:var(--green2);color:var(--green)}
+.badge-navy{background:var(--navy);color:#fff}
+
+/* テーブル */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{background:var(--navy);color:#fff;padding:8px 12px;text-align:left;font-size:11px;font-weight:600;white-space:nowrap}
+.tbl td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--sky2)}
+.tbl .actions{display:flex;gap:4px;justify-content:flex-end}
+
+/* カレンダー */
+.cal-nav{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cal-nav h2{font-size:17px;font-weight:700;color:var(--navy)}
+.cal-wrap{overflow-x:auto}
+.cal-table{border-collapse:collapse;font-size:12px;white-space:nowrap}
+.cal-table th,.cal-table td{border:1px solid var(--border);padding:0;text-align:center}
+.col-name{background:var(--navy);color:#fff;font-size:11px;font-weight:600;padding:7px 12px;text-align:left;min-width:80px;position:sticky;left:0;z-index:2}
+.col-date{min-width:44px;padding:4px 2px;background:var(--navy2);color:#fff;font-size:10px;font-weight:600}
+.col-date.sat{background:#1a5276}.col-date.sun,.col-date.hol{background:#6e2121}
+.row-hdr{background:#f8f9fa;padding:6px 12px;text-align:left;font-weight:600;font-size:12px;color:var(--navy);position:sticky;left:0;z-index:2}
+.cal-cell{width:44px;height:32px;cursor:pointer;font-size:11px;font-weight:600;user-select:none}
+.cal-cell:hover{opacity:.75}
+.cal-cell.s-出社{background:#d6eaf8;color:#1a5276}
+.cal-cell.s-在宅{background:#d5f5e3;color:#1a7040}
+.cal-cell.s-休日{background:#f8f9fa;color:#bdc3c7}
+.cal-cell.s-有休{background:#fdebd0;color:#935116}
+.cal-cell.s-客先{background:#e8daef;color:#6c3483}
+.cal-cell.s-null{background:#fff;color:#dde}
+.cnt-row td{background:var(--sky2);font-size:11px;font-weight:700;color:var(--blue)}
+.cnt-row .col-name{background:var(--sky);color:var(--navy);font-size:11px}
+.cnt-alert{background:var(--red2)!important;color:var(--red)!important}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px}
+.legend-dot{width:14px;height:14px;border-radius:3px}
+
+/* 業務カード */
+.task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.task-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:13px 15px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.task-card:hover{box-shadow:0 4px 16px rgba(26,39,68,.13);border-color:var(--blue2)}
+.tc-cat{font-size:10px;color:var(--gray);margin-bottom:3px}
+.tc-header{display:flex;align-items:flex-start;gap:7px;margin-bottom:7px}
+.tc-title{font-size:13px;font-weight:700;color:var(--navy);flex:1;line-height:1.4}
+.tc-body{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.tc-footer{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.assignee-chip{display:inline-flex;align-items:center;gap:5px;background:var(--sky2);border:1px solid var(--sky);border-radius:20px;padding:2px 9px;font-size:11px;color:var(--blue)}
+.assignee-chip.unset{background:var(--gray2);border-color:var(--border);color:var(--gray)}
+
+/* サマリー */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.s-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:13px 15px;box-shadow:var(--shadow)}
+.s-label{font-size:11px;color:var(--gray);margin-bottom:3px}
+.s-value{font-size:23px;font-weight:700;color:var(--navy)}
+.s-sub{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* モーダル */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;justify-content:center;align-items:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:10px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.modal-sm{width:400px}
+.modal-header{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.modal-header h3{font-size:15px;font-weight:700;color:var(--navy);flex:1}
+.modal-close{cursor:pointer;font-size:20px;color:var(--gray);background:none;border:none}
+.modal-body{padding:16px 18px}
+.modal-footer{padding:10px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+
+/* フォーム */
+.fg{margin-bottom:13px}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
+.fg label .req{color:var(--red);margin-left:3px}
+.fc{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:var(--font);transition:border-color .15s}
+.fc:focus{outline:none;border-color:var(--blue2);box-shadow:0 0 0 3px rgba(46,109,164,.12)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-check{display:flex;align-items:center;gap:8px;font-size:13px}
+.form-check input{width:16px;height:16px;cursor:pointer}
+
+/* 操作ログ */
+.log-action{font-size:11px;padding:2px 7px;border-radius:10px;font-weight:600}
+.log-LOGIN,.log-LOGOUT{background:#f8f9fa;color:#5d6d7e}
+.log-ADD_EMPLOYEE,.log-ADD_TASK{background:#d6eaf8;color:#1a5276}
+.log-EDIT_EMPLOYEE,.log-EDIT_TASK,.log-EDIT_ATTENDANCE{background:#fdebd0;color:#935116}
+.log-DELETE_EMPLOYEE,.log-DELETE_TASK{background:#fde8e6;color:#c0392b}
+.log-ASSIGN_TASK{background:#e8daef;color:#6c3483}
+.log-SETUP_PASSWORD,.log-CHANGE_PASSWORD,.log-RESET_PASSWORD{background:#f8f9fa;color:#5d6d7e}
+
+/* 検索 */
+.search-box{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search-input{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:var(--font);width:220px}
+.filter-sel{padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:var(--font)}
+
+/* トースト */
+#toast{position:fixed;bottom:22px;right:22px;z-index:9999;background:var(--navy);color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.error{background:var(--red)}
+
+/* エラーメッセージ */
+.error-msg{background:var(--red2);border:1px solid #f5b7b1;color:var(--red);padding:9px 12px;border-radius:6px;font-size:13px;margin-bottom:12px;display:none}
+.error-msg.show{display:block}
+.empty{text-align:center;padding:36px;color:var(--gray);font-size:13px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:#c5cdd6;border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <span class="logo-icon">🏢</span>
+      <h1>広島オフィス 管理システム</h1>
+      <p>コスミックビジネス株式会社</p>
+    </div>
+    <!-- STEP0: 初期設定（初回のみ） -->
+    <div class="login-step" id="step0">
+      <div class="login-info-box">初回アクセスの設定です。管理者からアクセスキーを入手して入力してください。</div>
+      <div class="fg"><label>アクセスキー<span class="req">*</span></label>
+        <input class="fc" id="accessKey" type="password" placeholder="管理者から配布されたキーを入力">
+      </div>
+      <div class="error-msg" id="step0Error"></div>
+      <button class="btn btn-primary btn-block" onclick="setupAccessKey()">設定して開始</button>
+    </div>
+    <!-- STEP1: 社員ID -->
+    <div class="login-step" id="step1">
+      <div class="fg"><label>社員ID<span class="req">*</span></label>
+        <input class="fc" id="loginEmpId" placeholder="例：emp001" autocomplete="username">
+      </div>
+      <div class="error-msg" id="step1Error"></div>
+      <button class="btn btn-primary btn-block" onclick="checkEmpId()">次へ →</button>
+    </div>
+    <!-- STEP2a: 初回PW設定 -->
+    <div class="login-step" id="step2setup">
+      <div class="login-info-box"><strong id="setupName"></strong>さん、ようこそ！<br>初回ログインのため、パスワードを設定してください。</div>
+      <div class="fg"><label>新しいパスワード<span class="req">*</span></label>
+        <input class="fc" id="setupPw1" type="password" placeholder="8文字以上">
+      </div>
+      <div class="fg"><label>パスワード確認<span class="req">*</span></label>
+        <input class="fc" id="setupPw2" type="password">
+      </div>
+      <div class="error-msg" id="setupError"></div>
+      <button class="btn btn-success btn-block" onclick="setupPassword()">パスワードを設定してログイン</button>
+      <button class="btn btn-secondary btn-block" style="margin-top:8px" onclick="backToStep1()">← 戻る</button>
+    </div>
+    <!-- STEP2b: PW入力 -->
+    <div class="login-step" id="step2login">
+      <div class="login-info-box" id="loginName"></div>
+      <div class="fg"><label>パスワード<span class="req">*</span></label>
+        <input class="fc" id="loginPw" type="password" autocomplete="current-password">
+      </div>
+      <div class="error-msg" id="loginError"></div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">ログイン</button>
+      <button class="btn btn-secondary btn-block" style="margin-top:8px" onclick="backToStep1()">← 戻る</button>
+    </div>
+  </div>
+</div>
+
+<!-- メインアプリ -->
+<div id="app" style="display:none">
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-t">🏢 広島オフィス</div>
+      <div class="logo-s">庶務管理システム</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-sec-label">メニュー</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')"><span>📊</span>ダッシュボード</div>
+      <div class="nav-item" data-page="calendar" onclick="navigate('calendar')"><span>📅</span>出社・在宅カレンダー</div>
+      <div class="nav-item" data-page="tasks" onclick="navigate('tasks')"><span>📋</span>庶務業務管理<span class="nav-badge" id="unassignedBadge" style="display:none"></span></div>
+      <div class="nav-item" data-page="employees" onclick="navigate('employees')"><span>👥</span>社員マスタ</div>
+      <div class="nav-item admin-only" data-page="logs" onclick="navigate('logs')" style="display:none"><span>📜</span>操作ログ</div>
+    </div>
+    <div class="sidebar-user">
+      <strong id="sidebarName">-</strong>
+      <span id="sidebarRole"></span>
+      <button class="btn-logout" onclick="doLogout()">ログアウト</button>
+      <button class="btn-logout" style="margin-top:4px" onclick="openChangePw()">🔑 パスワード変更</button>
+    </div>
+  </nav>
+  <div id="main">
+    <div id="topbar">
+      <div class="topbar-title" id="topbarTitle">ダッシュボード</div>
+      <div class="topbar-sub" id="topbarSub">広島オフィス 運用管理</div>
+    </div>
+    <div id="content">
+      <!-- ダッシュボード -->
+      <div class="page active" id="page-dashboard">
+        <div class="summary-grid" id="summaryGrid"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="card"><div class="card-header"><h3>📋 担当未定の業務</h3></div><div class="card-body" id="dashUnassigned"></div></div>
+          <div class="card"><div class="card-header"><h3>👥 在籍社員一覧</h3></div><div class="card-body" id="dashEmployees"></div></div>
+        </div>
+        <div class="card" style="margin-top:14px"><div class="card-header"><h3>📅 今月の出社状況（直近）</h3></div><div class="card-body" id="dashCalPreview"></div></div>
+      </div>
+      <!-- カレンダー -->
+      <div class="page" id="page-calendar">
+        <div class="card">
+          <div class="card-header">
+            <div class="cal-nav">
+              <button class="btn btn-secondary btn-sm" onclick="calPrev()">◀</button>
+              <h2 id="calMonthLabel"></h2>
+              <button class="btn btn-secondary btn-sm" onclick="calNext()">▶</button>
+            </div>
+            <div class="hdr-actions"><button class="btn btn-primary btn-sm" onclick="openBulkEdit()">✏️ 一括入力</button></div>
+          </div>
+          <div class="card-body">
+            <div class="legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#d6eaf8"></div>出社</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#d5f5e3"></div>在宅</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#f8f9fa"></div>休日</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#fdebd0"></div>有休</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#e8daef"></div>客先</div>
+              <span style="margin-left:auto;font-size:11px;color:var(--gray)">セルをクリックして変更</span>
+            </div>
+            <div class="cal-wrap" id="calWrap"></div>
+          </div>
+        </div>
+      </div>
+      <!-- 業務管理 -->
+      <div class="page" id="page-tasks">
+        <div class="search-box">
+          <input class="search-input" id="taskSearch" placeholder="🔍 業務を検索…" oninput="renderTasks()">
+          <select class="filter-sel" id="taskPF" onchange="renderTasks()">
+            <option value="">優先度：すべて</option><option value="高">高</option><option value="中">中</option><option value="低">低</option>
+          </select>
+          <select class="filter-sel" id="taskSF" onchange="renderTasks()">
+            <option value="">状態：すべて</option><option value="担当未定">担当未定</option><option value="仮決定">仮決定</option><option value="確定">確定</option>
+          </select>
+          <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openTaskModal()">＋ 業務を追加</button>
+        </div>
+        <div class="task-grid" id="taskGrid"></div>
+      </div>
+      <!-- 社員マスタ -->
+      <div class="page" id="page-employees">
+        <div class="search-box">
+          <input class="search-input" id="empSearch" placeholder="🔍 社員を検索…" oninput="renderEmployees()">
+          <select class="filter-sel" id="empSF" onchange="renderEmployees()">
+            <option value="在籍">在籍のみ</option><option value="">すべて</option><option value="退職">退職</option>
+          </select>
+          <button class="btn btn-primary btn-sm admin-only" style="margin-left:auto;display:none" onclick="openEmpModal()">＋ 社員を追加</button>
+        </div>
+        <div class="card"><div class="card-body" style="padding:0">
+          <table class="tbl"><thead><tr>
+            <th>氏名</th><th>かな</th><th>区分</th><th>権限</th><th>状態</th><th>客先常駐</th><th>PW状態</th><th>最終ログイン</th><th>備考</th>
+            <th class="admin-only" style="width:120px">操作</th>
+          </tr></thead><tbody id="empTbody"></tbody></table>
+        </div></div>
+      </div>
+      <!-- 操作ログ -->
+      <div class="page" id="page-logs">
+        <div class="search-box">
+          <select class="filter-sel" id="logLimit" onchange="loadLogs()"><option value="50">直近50件</option><option value="100">直近100件</option></select>
+          <button class="btn btn-secondary btn-sm" onclick="loadLogs()">🔄 更新</button>
+        </div>
+        <div class="card"><div class="card-body" style="padding:0">
+          <table class="tbl"><thead><tr><th>日時</th><th>操作者</th><th>アクション</th><th>詳細</th></tr></thead>
+          <tbody id="logTbody"></tbody></table>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- モーダル: PW変更 -->
+<div class="modal-overlay" id="changePwModal">
+  <div class="modal modal-sm">
+    <div class="modal-header"><h3>🔑 パスワード変更</h3><button class="modal-close" onclick="closeModal('changePwModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>現在のパスワード<span class="req">*</span></label><input class="fc" id="curPw" type="password"></div>
+      <div class="fg"><label>新しいパスワード<span class="req">*</span></label><input class="fc" id="newPw1" type="password" placeholder="8文字以上"></div>
+      <div class="fg"><label>確認<span class="req">*</span></label><input class="fc" id="newPw2" type="password"></div>
+      <div class="error-msg" id="changePwError"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('changePwModal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="changePassword()">変更する</button>
+    </div>
+  </div>
+</div>
+
+<!-- モーダル: 社員 -->
+<div class="modal-overlay" id="empModal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="empModalTitle">社員を追加</h3><button class="modal-close" onclick="closeModal('empModal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="empId">
+      <div class="form-row">
+        <div class="fg"><label>氏名<span class="req">*</span></label><input class="fc" id="empName" placeholder="山田 太郎"></div>
+        <div class="fg"><label>よみがな</label><input class="fc" id="empKana" placeholder="ヤマダ タロウ"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>区分</label>
+          <select class="fc" id="empType"><option>社員</option><option>契約社員</option><option>派遣</option><option>取締役</option><option>その他</option></select>
+        </div>
+        <div class="fg"><label>権限</label>
+          <select class="fc" id="empRole"><option value="member">一般</option><option value="admin">管理者</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>在籍状態</label>
+          <select class="fc" id="empStatus"><option>在籍</option><option>休職</option><option>退職</option></select>
+        </div>
+        <div class="fg"><label>入社日</label><input class="fc" id="empJoinDate" type="date"></div>
+      </div>
+      <div class="form-row" style="margin-bottom:12px">
+        <div class="form-check"><input type="checkbox" id="empRemote"><label for="empRemote">テレワーク対象</label></div>
+        <div class="form-check"><input type="checkbox" id="empClient"><label for="empClient">客先常駐</label></div>
+      </div>
+      <div class="fg"><label>備考</label><textarea class="fc" id="empNote" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('empModal')">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveEmployee()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- モーダル: 業務 -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal">
+    <div class="modal-header"><h3 id="taskModalTitle">業務を追加</h3><button class="modal-close" onclick="closeModal('taskModal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="taskId">
+      <div class="form-row">
+        <div class="fg"><label>カテゴリ<span class="req">*</span></label>
+          <input class="fc" id="taskCat" list="catList">
+          <datalist id="catList"><option>セキュリティ</option><option>入退室管理</option><option>鍵管理</option><option>テレワーク管理</option><option>備品・消耗品</option><option>清掃</option><option>安否確認</option><option>業者対応</option><option>郵便物・個人物品</option><option>資産管理</option><option>イレギュラー対応</option><option>その他</option></datalist>
+        </div>
+        <div class="fg"><label>優先度</label>
+          <select class="fc" id="taskPri"><option>高</option><option selected>中</option><option>低</option></select>
+        </div>
+      </div>
+      <div class="fg"><label>業務名<span class="req">*</span></label><input class="fc" id="taskTitle"></div>
+      <div class="fg"><label>内容・説明</label><textarea class="fc" id="taskDesc" rows="2"></textarea></div>
+      <div class="form-row">
+        <div class="fg"><label>頻度</label><input class="fc" id="taskFreq" list="freqList"><datalist id="freqList"><option>随時</option><option>週次</option><option>月次</option></datalist></div>
+        <div class="fg"><label>ローテーション</label>
+          <select class="fc" id="taskRot"><option value="fixed">固定担当</option><option value="weekly">週次ローテ</option><option value="monthly">月次ローテ</option><option value="oncall">出社者対応</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>主担当</label><select class="fc" id="taskAssignee"></select></div>
+        <div class="fg"><label>副担当</label><select class="fc" id="taskSubAssignee"></select></div>
+      </div>
+      <div class="fg"><label>状態</label>
+        <select class="fc" id="taskStatus"><option>担当未定</option><option>仮決定</option><option>確定</option></select>
+      </div>
+      <div class="fg"><label>備考</label><textarea class="fc" id="taskNote" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('taskModal')">キャンセル</button>
+      <button class="btn btn-danger btn-sm" id="taskDeleteBtn" style="margin-right:auto;display:none" onclick="deleteTask()">削除</button>
+      <button class="btn btn-primary" onclick="saveTask()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- モーダル: 一括入力 -->
+<div class="modal-overlay" id="bulkModal">
+  <div class="modal" style="width:440px">
+    <div class="modal-header"><h3>✏️ 一括入力</h3><button class="modal-close" onclick="closeModal('bulkModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>社員</label><select class="fc" id="bulkEmp" onchange="renderBulkGrid()"></select></div>
+      <div id="bulkGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('bulkModal')">閉じる</button>
+      <button class="btn btn-primary" onclick="saveBulk()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════
+// 設定（GitHub API）
+// ════════════════════════════════════
+function getToken(){ return localStorage.getItem('hiroshima_gh_token') || ''; }
+const GH_REPO   = 'cos-hiroshima/hiroshima-office-app';
+const GH_BRANCH = 'data';
+
+// ════════════════════════════════════
+// GitHub API ストレージ
+// ════════════════════════════════════
+const shas = {};
+async function ghRead(file) {
+  const r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/data/${file}?ref=${GH_BRANCH}&t=${Date.now()}`, {
+    headers: { 'Authorization': `token ${getToken()}`, 'Accept': 'application/vnd.github.v3+json' }
+  });
+  const d = await r.json();
+  if (d.message) return null;
+  shas[file] = d.sha;
+  return JSON.parse(atob(d.content.replace(/\n/g, '')));
+}
+async function ghWrite(file, data) {
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  const r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/data/${file}`, {
+    method: 'PUT',
+    headers: { 'Authorization': `token ${getToken()}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+    body: JSON.stringify({ message: `update ${file}`, content, branch: GH_BRANCH, ...(shas[file] ? { sha: shas[file] } : {}) })
+  });
+  const d = await r.json();
+  if (d.content) shas[file] = d.content.sha;
+  return d;
+}
+
+// ════════════════════════════════════
+// 認証（bcryptなし→ハッシュはサーバー不要のため平文ハッシュ代替）
+// セッション情報はlocalStorageに保存
+// ════════════════════════════════════
+// 簡易ハッシュ（CryptoAPI）
+async function hashPw(pw) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw + 'hiroshima-salt-2026'));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+let me = null;
+let employees = [], tasks = [], attendance = {}, logsData = [];
+let calYear = new Date().getFullYear(), calMonth = new Date().getMonth() + 1;
+let bulkSel = {};
+
+const STATUS_CYCLE = ['出社','在宅','休日','有休','客先'];
+const STATUS_LBL   = {'出社':'出','在宅':'在','休日':'休','有休':'有','客先':'客'};
+const WD_JP = ['日','月','火','水','木','金','土'];
+const PRIO  = {'高':0,'中':1,'低':2};
+const HOLIDAYS = new Set(['2026-01-01','2026-01-12','2026-02-11','2026-02-23','2026-03-20','2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23','2026-10-12','2026-11-03','2026-11-23']);
+
+function toast(msg, err=false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show' + (err ? ' error' : '');
+  clearTimeout(el._t); el._t = setTimeout(() => el.className = '', 3000);
+}
+function showErr(id, msg) { const el=document.getElementById(id); el.textContent=msg; el.classList.add('show'); }
+function hideErr(id) { document.getElementById(id).classList.remove('show'); }
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function ymStr() { return `${calYear}-${String(calMonth).padStart(2,'0')}`; }
+function daysIn(y,m) { return new Date(y,m,0).getDate(); }
+function dow(y,m,d) { return new Date(y,m-1,d).getDay(); }
+function isHol(y,m,d) { return HOLIDAYS.has(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`); }
+function activeEmps() { return employees.filter(e => e.status === '在籍'); }
+function empName(id) { return (employees.find(e=>e.id===id)||{}).name || '未設定'; }
+function isAdmin() { return me?.role === 'admin'; }
+function now() { return new Date().toISOString().replace('T',' ').slice(0,19); }
+function uuid() { return 'id' + Date.now() + Math.random().toString(36).slice(2); }
+
+// ════ ログイン ════
+let loginEmpId = '';
+
+async function checkEmpId() {
+  hideErr('step1Error');
+  loginEmpId = document.getElementById('loginEmpId').value.trim();
+  if (!loginEmpId) { showErr('step1Error','社員IDを入力してください'); return; }
+  try {
+    employees = await ghRead('employees.json') || [];
+    const emp = employees.find(e => e.id === loginEmpId);
+    if (!emp || emp.status === '退職') { showErr('step1Error','社員IDが見つかりません'); return; }
+    const auths = await ghRead('auth.json') || [];
+    const auth = auths.find(a => a.emp_id === loginEmpId);
+    if (!auth) { showErr('step1Error','社員IDが見つかりません'); return; }
+    if (!auth.password_hash) {
+      document.getElementById('setupName').textContent = emp.name;
+      switchStep('step2setup');
+    } else {
+      document.getElementById('loginName').innerHTML = `<strong>${emp.name}</strong>さん、パスワードを入力してください`;
+      document.getElementById('loginPw').value = '';
+      switchStep('step2login');
+      setTimeout(() => document.getElementById('loginPw').focus(), 50);
+    }
+  } catch(e) { showErr('step1Error', 'エラーが発生しました: ' + e.message); }
+}
+
+async function setupPassword() {
+  hideErr('setupError');
+  const p1 = document.getElementById('setupPw1').value;
+  const p2 = document.getElementById('setupPw2').value;
+  if (p1.length < 8) { showErr('setupError','8文字以上で設定してください'); return; }
+  if (p1 !== p2) { showErr('setupError','パスワードが一致しません'); return; }
+  try {
+    const h = await hashPw(p1);
+    const auths = await ghRead('auth.json') || [];
+    const idx = auths.findIndex(a => a.emp_id === loginEmpId);
+    if (idx === -1) { showErr('setupError','エラー'); return; }
+    auths[idx].password_hash = h;
+    auths[idx].must_change = 0;
+    await ghWrite('auth.json', auths);
+    await addLog(loginEmpId, null, 'SETUP_PASSWORD', '初回パスワード設定');
+    await doLoginWithHash(h);
+  } catch(e) { showErr('setupError', e.message); }
+}
+
+async function doLogin() {
+  hideErr('loginError');
+  const pw = document.getElementById('loginPw').value;
+  if (!pw) { showErr('loginError','パスワードを入力してください'); return; }
+  try {
+    const h = await hashPw(pw);
+    await doLoginWithHash(h);
+  } catch(e) { showErr('loginError', e.message); }
+}
+
+async function doLoginWithHash(h) {
+  const auths = await ghRead('auth.json') || [];
+  const auth = auths.find(a => a.emp_id === loginEmpId);
+  if (!auth || auth.password_hash !== h) throw new Error('IDまたはパスワードが違います');
+  const emp = employees.find(e => e.id === loginEmpId);
+  auth.last_login = now();
+  await ghWrite('auth.json', auths);
+  me = emp;
+  localStorage.setItem('hiroshima_session', JSON.stringify({ empId: emp.id, empName: emp.name, role: emp.role }));
+  await initApp();
+}
+
+async function doLogout() {
+  await addLog(me?.id, me?.name, 'LOGOUT', 'ログアウト');
+  localStorage.removeItem('hiroshima_session');
+  me = null; location.reload();
+}
+
+function setupAccessKey() {
+  hideErr('step0Error');
+  const key = document.getElementById('accessKey').value.trim();
+  if (!key) { showErr('step0Error','アクセスキーを入力してください'); return; }
+  if (!key.startsWith('ghp_') && !key.startsWith('github_pat_')) {
+    showErr('step0Error','無効なアクセスキーです'); return;
+  }
+  localStorage.setItem('hiroshima_gh_token', key);
+  // ページリロードで反映
+  location.reload();
+}
+function backToStep1() {
+  switchStep('step1');
+  ['step1Error','setupError','loginError'].forEach(hideErr);
+}
+function switchStep(id) {
+  document.querySelectorAll('.login-step').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+document.getElementById('loginEmpId').addEventListener('keydown', e => { if(e.key==='Enter') checkEmpId(); });
+document.addEventListener('keydown', e => {
+  if (e.key==='Enter' && document.getElementById('step2login').classList.contains('active')) doLogin();
+});
+
+// ════ アプリ初期化 ════
+async function initApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('sidebarName').textContent = me.name;
+  document.getElementById('sidebarRole').textContent = me.role === 'admin' ? '（管理者）' : '';
+  if (isAdmin()) document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+  await loadAll();
+  await addLog(me.id, me.name, 'LOGIN', 'ログイン成功');
+  renderDashboard();
+}
+async function loadAll() {
+  [employees, tasks] = await Promise.all([ghRead('employees.json'), ghRead('tasks.json')]);
+  employees = employees || []; tasks = tasks || [];
+  attendance = await ghRead('attendance.json') || {};
+  updateBadge();
+}
+function updateBadge() {
+  const n = tasks.filter(t => !t.assignee_id).length;
+  const el = document.getElementById('unassignedBadge');
+  if (n > 0) { el.textContent = n; el.style.display = ''; } else el.style.display = 'none';
+}
+
+// ログ追加
+async function addLog(empId, empName, action, detail) {
+  try {
+    const logs = await ghRead('audit_log.json') || [];
+    logs.unshift({ id: uuid(), emp_id: empId||'', emp_name: empName||'', action, detail: detail||'', created_at: now() });
+    if (logs.length > 300) logs.splice(300);
+    await ghWrite('audit_log.json', logs);
+  } catch(e) { console.warn('log error:', e); }
+}
+
+// ════ ナビゲーション ════
+const PAGE_META = {
+  dashboard: ['ダッシュボード','広島オフィス 運用管理'],
+  calendar:  ['出社・在宅カレンダー','月別スケジュール管理'],
+  tasks:     ['庶務業務管理','担当割当・タスク一覧'],
+  employees: ['社員マスタ','社員情報の登録・編集・削除'],
+  logs:      ['操作ログ','操作履歴'],
+};
+function navigate(page) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelector(`[data-page="${page}"]`).classList.add('active');
+  document.getElementById(`page-${page}`).classList.add('active');
+  const [t,s] = PAGE_META[page];
+  document.getElementById('topbarTitle').textContent = t;
+  document.getElementById('topbarSub').textContent = s;
+  if (page==='dashboard') renderDashboard();
+  if (page==='calendar')  renderCalendar();
+  if (page==='tasks')     renderTasks();
+  if (page==='employees') renderEmployees();
+  if (page==='logs')      loadLogs();
+}
+
+// ════ ダッシュボード ════
+function workdays(y,m) {
+  let cnt=0; for(let d=1;d<=daysIn(y,m);d++){const dw=dow(y,m,d);if(dw!==0&&dw!==6&&!isHol(y,m,d))cnt++;}
+  return cnt;
+}
+function renderDashboard() {
+  const active = activeEmps(), unassigned = tasks.filter(t => !t.assignee_id);
+  const highPending = tasks.filter(t => t.priority==='高' && t.status!=='確定');
+  document.getElementById('summaryGrid').innerHTML = [
+    {label:'在籍社員数', value: active.length+'名', sub:'退職・休職除く'},
+    {label:'担当未定業務', value: unassigned.length+'件', sub:`全${tasks.length}件中`},
+    {label:'高優先（未確定）', value: highPending.length+'件', sub:'要対応'},
+    {label:'今月稼働日数', value: workdays(calYear,calMonth)+'日', sub:`${calYear}年${calMonth}月`},
+  ].map(s=>`<div class="s-card"><div class="s-label">${s.label}</div><div class="s-value">${s.value}</div><div class="s-sub">${s.sub}</div></div>`).join('');
+  document.getElementById('dashUnassigned').innerHTML = unassigned.length === 0
+    ? '<div class="empty">✅ 全業務に担当者が設定されています</div>'
+    : unassigned.map(t=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+        <span class="badge badge-${t.priority==='高'?'high':t.priority==='中'?'mid':'low'}">${t.priority}</span>
+        <span style="font-size:13px;font-weight:600">${t.title}</span>
+        <span style="font-size:11px;color:var(--gray);margin-left:auto">${t.category}</span>
+        <button class="btn btn-secondary btn-sm" onclick="openTaskModal('${t.id}')">設定</button>
+      </div>`).join('');
+  document.getElementById('dashEmployees').innerHTML = active.map(e=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px;font-weight:600">${e.name}</span>
+      <span class="badge badge-gray">${e.emp_type}</span>
+      ${e.client_site ? '<span class="badge badge-mid">客先常駐</span>' : ''}
+      <span style="font-size:11px;color:var(--gray);margin-left:auto">${e.note||''}</span>
+    </div>`).join('');
+  // カレンダープレビュー
+  const att = attendance[ymStr()] || {};
+  const wdays=[]; for(let d=1;d<=Math.min(14,daysIn(calYear,calMonth));d++){const dw=dow(calYear,calMonth,d);if(dw!==0&&dw!==6&&!isHol(calYear,calMonth,d))wdays.push(d);}
+  const colors={'出社':'#d6eaf8','在宅':'#d5f5e3','休日':'#f8f9fa','有休':'#fdebd0','客先':'#e8daef'};
+  let html=`<div style="overflow-x:auto"><table class="cal-table"><tr><th class="col-name">氏名</th>`;
+  wdays.forEach(d=>{const dw=dow(calYear,calMonth,d);html+=`<th class="col-date">${d}<br>${WD_JP[dw]}</th>`;});
+  html+='</tr>';
+  active.forEach(e=>{
+    html+=`<tr><td class="row-hdr">${e.name}</td>`;
+    wdays.forEach(d=>{const st=(att[e.id]||{})[d]||null;html+=`<td class="cal-cell" style="background:${colors[st]||'#fff'}">${STATUS_LBL[st]||'－'}</td>`;});
+    html+='</tr>';
+  });
+  html+=`<tr class="cnt-row"><td class="col-name">出社人数</td>`;
+  wdays.forEach(d=>{const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;html+=`<td class="${cnt<2?'cnt-alert':''}">${cnt}</td>`;});
+  html+='</tr></table></div>';
+  document.getElementById('dashCalPreview').innerHTML = html;
+}
+
+// ════ カレンダー ════
+function renderCalendar() {
+  document.getElementById('calMonthLabel').textContent = `${calYear}年 ${calMonth}月`;
+  const ym = ymStr(), att = attendance[ym] || {}, active = activeEmps(), days = daysIn(calYear, calMonth);
+  let html=`<table class="cal-table"><tr><th class="col-name">氏名</th>`;
+  for(let d=1;d<=days;d++){const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);const cls=hol?'col-date hol':dw===6?'col-date sat':dw===0?'col-date sun':'col-date';html+=`<th class="${cls}">${d}<br>${WD_JP[dw]}</th>`;}
+  html+='</tr>';
+  active.forEach(e=>{
+    html+=`<tr><td class="row-hdr">${e.name}${e.client_site?'<span style="font-size:10px;background:var(--amber2);color:var(--amber);border-radius:4px;padding:1px 5px;margin-left:4px">客先</span>':''}</td>`;
+    for(let d=1;d<=days;d++){const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);let st=(att[e.id]||{})[d]||null;if(!st&&(dw===0||dw===6||hol))st='休日';html+=`<td class="cal-cell s-${st||'null'}" onclick="cycleStatus('${e.id}',${d})">${STATUS_LBL[st]||'－'}</td>`;}
+    html+='</tr>';
+  });
+  html+=`<tr class="cnt-row"><td class="col-name">出社人数</td>`;
+  for(let d=1;d<=days;d++){const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);if(dw===0||dw===6||hol){html+='<td style="background:#f8f9fa;color:#bdc3c7">－</td>';continue;}const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;html+=`<td class="${cnt<2?'cnt-alert':''}">${cnt}</td>`;}
+  html+='</tr></table>';
+  document.getElementById('calWrap').innerHTML = html;
+}
+
+async function cycleStatus(empId, day) {
+  const ym = ymStr();
+  if (!attendance[ym]) attendance[ym] = {};
+  if (!attendance[ym][empId]) attendance[ym][empId] = {};
+  const cur = attendance[ym][empId][day] || null;
+  const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(cur)+1) % STATUS_CYCLE.length];
+  attendance[ym][empId][day] = next;
+  renderCalendar();
+  try {
+    await ghWrite('attendance.json', attendance);
+    const nm = empName(empId);
+    await addLog(me.id, me.name, 'EDIT_ATTENDANCE', `${nm} ${ym}/${day}→${next}`);
+  } catch(e) { toast('保存エラー: ' + e.message, true); }
+}
+
+async function calPrev() { calMonth--; if(calMonth<1){calMonth=12;calYear--;} attendance=await ghRead('attendance.json')||{}; renderCalendar(); }
+async function calNext() { calMonth++; if(calMonth>12){calMonth=1;calYear++;} attendance=await ghRead('attendance.json')||{}; renderCalendar(); }
+
+function openBulkEdit() {
+  const sel = document.getElementById('bulkEmp');
+  sel.innerHTML = activeEmps().map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
+  bulkSel = {}; renderBulkGrid(); openModal('bulkModal');
+}
+function renderBulkGrid() {
+  bulkSel = {};
+  const empId = document.getElementById('bulkEmp').value;
+  const ym = ymStr(), att = (attendance[ym]||{})[empId]||{};
+  const days = daysIn(calYear,calMonth);
+  const colors={'出社':'#d6eaf8','在宅':'#d5f5e3','休日':'#f8f9fa','有休':'#fdebd0','客先':'#e8daef'};
+  let html='';
+  for(let d=1;d<=days;d++){const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);let st=att[d]||null;if(!st&&(dw===0||dw===6||hol))st='休日';html+=`<div id="bg${d}" data-st="${st||''}" onclick="toggleBulk(${d})" style="text-align:center;padding:3px 1px;border-radius:4px;border:1px solid var(--border);cursor:pointer;font-size:11px;font-weight:600;background:${colors[st]||'#fff'}"><div style="color:var(--gray);font-size:10px">${d}(${WD_JP[dw]})</div><div>${STATUS_LBL[st]||'－'}</div></div>`;}
+  document.getElementById('bulkGrid').innerHTML = html;
+}
+function toggleBulk(d) {
+  const el=document.getElementById('bg'+d);const cur=el.dataset.st||null;const next=STATUS_CYCLE[(STATUS_CYCLE.indexOf(cur)+1)%STATUS_CYCLE.length];const colors={'出社':'#d6eaf8','在宅':'#d5f5e3','休日':'#f8f9fa','有休':'#fdebd0','客先':'#e8daef'};
+  el.dataset.st=next;el.style.background=colors[next]||'#fff';el.querySelector('div:last-child').textContent=STATUS_LBL[next]||'－';bulkSel[d]=next;
+}
+async function saveBulk() {
+  const empId=document.getElementById('bulkEmp').value, ym=ymStr();
+  if(!attendance[ym])attendance[ym]={};if(!attendance[ym][empId])attendance[ym][empId]={};
+  Object.entries(bulkSel).forEach(([d,st])=>{attendance[ym][empId][parseInt(d)]=st;});
+  try { await ghWrite('attendance.json',attendance); closeModal('bulkModal'); renderCalendar(); toast('✅ 保存しました'); }
+  catch(e) { toast('保存エラー',true); }
+}
+
+// ════ 業務管理 ════
+function renderTasks() {
+  const q=document.getElementById('taskSearch').value.toLowerCase(), pf=document.getElementById('taskPF').value, sf=document.getElementById('taskSF').value;
+  let list=tasks.filter(t=>{if(q&&!t.title.toLowerCase().includes(q)&&!t.category.toLowerCase().includes(q))return false;if(pf&&t.priority!==pf)return false;if(sf&&t.status!==sf)return false;return true;}).sort((a,b)=>(PRIO[a.priority]||9)-(PRIO[b.priority]||9));
+  const grid=document.getElementById('taskGrid');
+  if(!list.length){grid.innerHTML='<div class="empty">該当する業務がありません</div>';return;}
+  const rot={fixed:'固定',weekly:'週次',monthly:'月次',oncall:'出社者対応'};
+  grid.innerHTML=list.map(t=>`<div class="task-card" onclick="openTaskModal('${t.id}')">
+    <div class="tc-cat">${t.category} · ${t.frequency} · ${rot[t.rotation_type]||t.rotation_type}</div>
+    <div class="tc-header"><div class="tc-title">${t.title}</div>
+      <span class="badge badge-${t.priority==='高'?'high':t.priority==='中'?'mid':'low'}">${t.priority}</span>
+      <span class="badge badge-${t.status==='確定'?'green':t.status==='仮決定'?'blue':'gray'}">${t.status}</span>
+    </div>
+    <div class="tc-body">${t.description||''}</div>
+    <div class="tc-footer">${t.assignee_id?`<div class="assignee-chip">👤 主: ${empName(t.assignee_id)}</div>`:'<div class="assignee-chip unset">👤 主担当未定</div>'}${t.sub_assignee_id?`<div class="assignee-chip">👥 副: ${empName(t.sub_assignee_id)}</div>`:''}</div>
+    ${t.note?`<div style="font-size:11px;color:var(--gray);margin-top:7px;padding-top:5px;border-top:1px solid var(--border)">📌 ${t.note}</div>`:''}
+  </div>`).join('');
+}
+
+function openTaskModal(id) {
+  const active=activeEmps();
+  const opts=label=>`<option value="">-- ${label} --</option>`+active.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
+  document.getElementById('taskAssignee').innerHTML=opts('未定');
+  document.getElementById('taskSubAssignee').innerHTML=opts('なし');
+  const del=document.getElementById('taskDeleteBtn');
+  if(id&&typeof id==='string'){
+    const t=tasks.find(t=>t.id===id);if(!t)return;
+    document.getElementById('taskModalTitle').textContent='業務を編集';
+    document.getElementById('taskId').value=t.id;
+    document.getElementById('taskCat').value=t.category;
+    document.getElementById('taskTitle').value=t.title;
+    document.getElementById('taskDesc').value=t.description||'';
+    document.getElementById('taskPri').value=t.priority;
+    document.getElementById('taskFreq').value=t.frequency;
+    document.getElementById('taskRot').value=t.rotation_type;
+    document.getElementById('taskAssignee').value=t.assignee_id||'';
+    document.getElementById('taskSubAssignee').value=t.sub_assignee_id||'';
+    document.getElementById('taskStatus').value=t.status;
+    document.getElementById('taskNote').value=t.note||'';
+    del.style.display=isAdmin()?'':'none';
+  } else {
+    document.getElementById('taskModalTitle').textContent='業務を追加';
+    document.getElementById('taskId').value='';
+    ['taskCat','taskTitle','taskDesc','taskFreq','taskNote'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('taskPri').value='中';document.getElementById('taskRot').value='fixed';document.getElementById('taskStatus').value='担当未定';
+    del.style.display='none';
+  }
+  openModal('taskModal');
+}
+async function saveTask() {
+  const id=document.getElementById('taskId').value;
+  const data={id:id||uuid(),category:document.getElementById('taskCat').value.trim(),title:document.getElementById('taskTitle').value.trim(),description:document.getElementById('taskDesc').value.trim(),priority:document.getElementById('taskPri').value,frequency:document.getElementById('taskFreq').value.trim(),rotation_type:document.getElementById('taskRot').value,assignee_id:document.getElementById('taskAssignee').value||null,sub_assignee_id:document.getElementById('taskSubAssignee').value||null,status:document.getElementById('taskStatus').value,note:document.getElementById('taskNote').value.trim(),created_at:now(),updated_at:now()};
+  if(!data.title){toast('業務名を入力してください',true);return;}
+  if(id){const idx=tasks.findIndex(t=>t.id===id);if(idx!==-1)tasks[idx]=data;else tasks.push(data);}else{tasks.push(data);}
+  try{await ghWrite('tasks.json',tasks);closeModal('taskModal');updateBadge();renderTasks();await addLog(me.id,me.name,id?'EDIT_TASK':'ADD_TASK',`「${data.title}」`);toast('✅ 保存しました');}
+  catch(e){toast('保存エラー',true);}
+}
+async function deleteTask() {
+  const id=document.getElementById('taskId').value;
+  if(!confirm('この業務を削除しますか？'))return;
+  tasks=tasks.filter(t=>t.id!==id);
+  try{await ghWrite('tasks.json',tasks);closeModal('taskModal');updateBadge();renderTasks();toast('🗑️ 削除しました');}
+  catch(e){toast('保存エラー',true);}
+}
+
+// ════ 社員マスタ ════
+function renderEmployees() {
+  const q=document.getElementById('empSearch').value.toLowerCase(), sf=document.getElementById('empSF').value;
+  let list=employees.filter(e=>{if(q&&!e.name.includes(q)&&!(e.name_kana||'').includes(q)&&!(e.note||'').includes(q))return false;if(sf&&e.status!==sf)return false;return true;});
+  const tbody=document.getElementById('empTbody');
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="10" class="empty">該当する社員がいません</td></tr>`;return;}
+  tbody.innerHTML=list.map(e=>`<tr>
+    <td><strong>${e.name}</strong></td><td>${e.name_kana||'－'}</td>
+    <td><span class="badge badge-blue">${e.emp_type}</span></td>
+    <td><span class="badge badge-${e.role==='admin'?'navy':'gray'}">${e.role==='admin'?'管理者':'一般'}</span></td>
+    <td><span class="badge badge-${e.status==='在籍'?'green':e.status==='休職'?'mid':'gray'}">${e.status}</span></td>
+    <td>${e.client_site?'<span class="badge badge-mid">客先</span>':'－'}</td>
+    <td><span class="badge badge-${e.has_password?'green':'high'}">${e.has_password?'設定済':'未設定'}</span></td>
+    <td style="font-size:11px">${e.last_login?e.last_login.slice(0,16):'なし'}</td>
+    <td style="font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.note||'－'}</td>
+    ${isAdmin()?`<td><div class="actions"><button class="btn btn-secondary btn-sm" onclick="openEmpModal('${e.id}')">編集</button><button class="btn btn-warning btn-sm" style="background:var(--amber);color:#fff" onclick="resetPw('${e.id}','${e.name}')">PW↩</button><button class="btn btn-danger btn-sm" onclick="deleteEmployee('${e.id}')">削除</button></div></td>`:'<td></td>'}
+  </tr>`).join('');
+}
+
+function openEmpModal(id) {
+  if(id){const e=employees.find(e=>e.id===id);if(!e)return;
+    document.getElementById('empModalTitle').textContent='社員情報を編集';
+    document.getElementById('empId').value=e.id;document.getElementById('empName').value=e.name;document.getElementById('empKana').value=e.name_kana||'';document.getElementById('empType').value=e.emp_type;document.getElementById('empRole').value=e.role;document.getElementById('empStatus').value=e.status;document.getElementById('empJoinDate').value=e.join_date||'';document.getElementById('empRemote').checked=!!e.remote_ok;document.getElementById('empClient').checked=!!e.client_site;document.getElementById('empNote').value=e.note||'';
+  } else {
+    document.getElementById('empModalTitle').textContent='社員を追加';
+    document.getElementById('empId').value='';['empName','empKana','empNote'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('empType').value='社員';document.getElementById('empRole').value='member';document.getElementById('empStatus').value='在籍';document.getElementById('empJoinDate').value='';document.getElementById('empRemote').checked=true;document.getElementById('empClient').checked=false;
+  }
+  openModal('empModal');
+}
+
+async function saveEmployee() {
+  const id=document.getElementById('empId').value;
+  const n=now();
+  const data={id:id||('emp'+Date.now()),name:document.getElementById('empName').value.trim(),name_kana:document.getElementById('empKana').value.trim(),emp_type:document.getElementById('empType').value,status:document.getElementById('empStatus').value,role:document.getElementById('empRole').value,email:'',remote_ok:document.getElementById('empRemote').checked?1:0,client_site:document.getElementById('empClient').checked?1:0,join_date:document.getElementById('empJoinDate').value,note:document.getElementById('empNote').value.trim(),created_at:n,updated_at:n,has_password:0,last_login:null};
+  if(!data.name){toast('氏名を入力してください',true);return;}
+  if(id){const idx=employees.findIndex(e=>e.id===id);if(idx!==-1){data.has_password=employees[idx].has_password;data.last_login=employees[idx].last_login;employees[idx]=data;}else employees.push(data);}
+  else{employees.push(data);const auths=await ghRead('auth.json')||[];auths.push({emp_id:data.id,password_hash:null,must_change:1,last_login:null});await ghWrite('auth.json',auths);alert(`追加しました。\n社員ID: ${data.id}\n初回ログイン時にパスワードを設定します。`);}
+  try{await ghWrite('employees.json',employees);closeModal('empModal');renderEmployees();await addLog(me.id,me.name,id?'EDIT_EMPLOYEE':'ADD_EMPLOYEE',`${data.name}`);toast('✅ 保存しました');}
+  catch(e){toast('保存エラー',true);}
+}
+
+async function deleteEmployee(id) {
+  const e=employees.find(e=>e.id===id);
+  if(!confirm(`「${e?.name}」を削除しますか？`))return;
+  employees=employees.filter(e=>e.id!==id);
+  try{
+    const auths=(await ghRead('auth.json')||[]).filter(a=>a.emp_id!==id);
+    await Promise.all([ghWrite('employees.json',employees),ghWrite('auth.json',auths)]);
+    renderEmployees();await addLog(me.id,me.name,'DELETE_EMPLOYEE',e?.name||'');toast('🗑️ 削除しました');
+  }catch(e){toast('保存エラー',true);}
+}
+
+async function resetPw(id, name) {
+  if(!confirm(`「${name}」のパスワードをリセットしますか？`))return;
+  try{
+    const auths=await ghRead('auth.json')||[];const a=auths.find(a=>a.emp_id===id);if(a){a.password_hash=null;a.must_change=1;}
+    await ghWrite('auth.json',auths);
+    employees=employees.map(e=>e.id===id?{...e,has_password:0}:e);
+    renderEmployees();await addLog(me.id,me.name,'RESET_PASSWORD',name);toast(`✅ ${name}のパスワードをリセットしました`);
+  }catch(e){toast('エラー',true);}
+}
+
+// ════ PW変更 ════
+function openChangePw(){['curPw','newPw1','newPw2'].forEach(x=>document.getElementById(x).value='');hideErr('changePwError');openModal('changePwModal');}
+async function changePassword() {
+  hideErr('changePwError');
+  const cur=document.getElementById('curPw').value, p1=document.getElementById('newPw1').value, p2=document.getElementById('newPw2').value;
+  if(p1.length<8){showErr('changePwError','8文字以上で設定してください');return;}
+  if(p1!==p2){showErr('changePwError','パスワードが一致しません');return;}
+  try{
+    const auths=await ghRead('auth.json')||[];const a=auths.find(a=>a.emp_id===me.id);
+    const curHash=await hashPw(cur);
+    if(a.password_hash!==curHash){showErr('changePwError','現在のパスワードが違います');return;}
+    a.password_hash=await hashPw(p1);a.must_change=0;
+    await ghWrite('auth.json',auths);closeModal('changePwModal');await addLog(me.id,me.name,'CHANGE_PASSWORD','');toast('✅ パスワードを変更しました');
+  }catch(e){showErr('changePwError',e.message);}
+}
+
+// ════ 操作ログ ════
+async function loadLogs(){
+  const limit=parseInt(document.getElementById('logLimit').value)||50;
+  logsData=await ghRead('audit_log.json')||[];
+  const tbody=document.getElementById('logTbody');
+  const list=logsData.slice(0,limit);
+  if(!list.length){tbody.innerHTML='<tr><td colspan="4" class="empty">ログがありません</td></tr>';return;}
+  tbody.innerHTML=list.map(l=>`<tr><td style="font-size:11px;white-space:nowrap">${l.created_at}</td><td style="font-size:12px;font-weight:600">${l.emp_name||'－'}</td><td><span class="log-action log-${l.action}">${l.action}</span></td><td style="font-size:12px">${l.detail||''}</td></tr>`).join('');
+}
+
+// ════ モーダル外クリック ════
+document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});});
+
+// ════ 起動時セッション復元 ════
+(async()=>{
+  // アクセスキー（GH_TOKEN）未設定なら初期設定画面へ
+  if(!localStorage.getItem('hiroshima_gh_token')){
+    switchStep('step0');
+    setTimeout(()=>document.getElementById('accessKey').focus(),50);
+    return;
+  }
+  const sess=localStorage.getItem('hiroshima_session');
+  if(sess){
+    try{
+      const s=JSON.parse(sess);
+      employees=await ghRead('employees.json')||[];
+      const emp=employees.find(e=>e.id===s.empId);
+      if(emp&&emp.status!=='退職'){me=emp;await initApp();return;}
+    }catch(e){}
+    localStorage.removeItem('hiroshima_session');
+  }
+})();
+</script>
+</body>
+</html>
