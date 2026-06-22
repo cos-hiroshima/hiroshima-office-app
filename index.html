@@ -241,6 +241,7 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
       <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')"><span>📊</span>ダッシュボード</div>
       <div class="nav-item" data-page="calendar" onclick="navigate('calendar')"><span>📅</span>出社・在宅カレンダー</div>
       <div class="nav-item" data-page="tasks" onclick="navigate('tasks')"><span>📋</span>庶務業務管理<span class="nav-badge" id="unassignedBadge" style="display:none"></span></div>
+      <div class="nav-item" data-page="access" onclick="navigate('access')"><span>🚪</span>入退室記録管理</div>
       <div class="nav-item" data-page="employees" onclick="navigate('employees')"><span>👥</span>社員マスタ</div>
       <div class="nav-item admin-only" data-page="logs" onclick="navigate('logs')" style="display:none"><span>📜</span>操作ログ</div>
     </div>
@@ -319,6 +320,38 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
             <th class="admin-only" style="width:120px">操作</th>
           </tr></thead><tbody id="empTbody"></tbody></table>
         </div></div>
+      </div>
+      <!-- 入退室記録 -->
+      <div class="page" id="page-access">
+        <div class="card">
+          <div class="card-header">
+            <h3>🚪 入退室記録</h3>
+            <div class="hdr-actions">
+              <button class="btn btn-secondary btn-sm" onclick="downloadAccessCSV()">📥 CSVダウンロード</button>
+              <button class="btn btn-primary btn-sm" onclick="openAccessModal()">＋ 記録を追加</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="search-box">
+              <input type="month" class="fc" id="accessYM" style="width:160px" onchange="renderAccessLog()">
+              <select class="filter-sel" id="accessEmpFilter" onchange="renderAccessLog()">
+                <option value="">全員</option>
+              </select>
+              <span style="font-size:12px;color:var(--gray);margin-left:auto" id="accessCount"></span>
+            </div>
+            <div style="overflow-x:auto">
+              <table class="tbl" id="accessTbl">
+                <thead><tr>
+                  <th>日付</th><th>曜日</th>
+                  <th>入室時間</th><th>開錠者</th>
+                  <th>退室時間</th><th>施錠者</th>
+                  <th>備考</th><th style="width:80px">操作</th>
+                </tr></thead>
+                <tbody id="accessTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
       <!-- 操作ログ -->
       <div class="page" id="page-logs">
@@ -440,6 +473,31 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('bulkModal')">閉じる</button>
       <button class="btn btn-primary" onclick="saveBulk()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- モーダル: 入退室記録 -->
+<div class="modal-overlay" id="accessModal">
+  <div class="modal modal-sm">
+    <div class="modal-header"><h3 id="accessModalTitle">入退室記録を追加</h3><button class="modal-close" onclick="closeModal('accessModal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="accessId">
+      <div class="fg"><label>日付<span class="req">*</span></label><input class="fc" id="accessDate" type="date"></div>
+      <div class="form-row">
+        <div class="fg"><label>入室時間</label><input class="fc" id="accessInTime" type="time"></div>
+        <div class="fg"><label>開錠者</label><select class="fc" id="accessInPerson"></select></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>退室時間</label><input class="fc" id="accessOutTime" type="time"></div>
+        <div class="fg"><label>施錠者</label><select class="fc" id="accessOutPerson"></select></div>
+      </div>
+      <div class="fg"><label>備考</label><input class="fc" id="accessNote" placeholder="特記事項など"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('accessModal')">キャンセル</button>
+      <button class="btn btn-danger btn-sm" id="accessDeleteBtn" style="margin-right:auto;display:none" onclick="deleteAccessLog()">削除</button>
+      <button class="btn btn-primary" onclick="saveAccessLog()">保存</button>
     </div>
   </div>
 </div>
@@ -658,6 +716,7 @@ const PAGE_META = {
   calendar:  ['出社・在宅カレンダー','月別スケジュール管理'],
   tasks:     ['庶務業務管理','担当割当・タスク一覧'],
   employees: ['社員マスタ','社員情報の登録・編集・削除'],
+  access:    ['入退室記録管理','入室・退室の記録'],
   logs:      ['操作ログ','操作履歴'],
 };
 function navigate(page) {
@@ -673,6 +732,7 @@ function navigate(page) {
   if (page==='tasks')     renderTasks();
   if (page==='employees') renderEmployees();
   if (page==='logs')      loadLogs();
+  if (page==='access')    initAccessPage();
 }
 
 // ════ ダッシュボード ════
@@ -927,6 +987,174 @@ async function changePassword() {
     a.password_hash=await hashPw(p1);a.must_change=0;
     await ghWrite('auth.json',auths);closeModal('changePwModal');await addLog(me.id,me.name,'CHANGE_PASSWORD','');toast('✅ パスワードを変更しました');
   }catch(e){showErr('changePwError',e.message);}
+}
+
+// ════ 入退室記録 ════
+let accessLogs = [];
+
+async function initAccessPage() {
+  // 今月をデフォルト
+  const today = new Date();
+  const ym = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+  const ymEl = document.getElementById('accessYM');
+  if (!ymEl.value) ymEl.value = ym;
+
+  // 社員フィルター
+  const sel = document.getElementById('accessEmpFilter');
+  sel.innerHTML = '<option value="">全員</option>' +
+    activeEmps().map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+
+  accessLogs = await ghRead('access_log.json') || [];
+  renderAccessLog();
+}
+
+function renderAccessLog() {
+  const ym = document.getElementById('accessYM').value;
+  const empF = document.getElementById('accessEmpFilter').value;
+  const WD = ['日','月','火','水','木','金','土'];
+
+  let list = accessLogs.filter(r => {
+    if (ym && !r.date.startsWith(ym)) return false;
+    if (empF && r.in_person_id !== empF && r.out_person_id !== empF) return false;
+    return true;
+  }).sort((a, b) => a.date.localeCompare(b.date));
+
+  document.getElementById('accessCount').textContent = `${list.length}件`;
+
+  const tbody = document.getElementById('accessTbody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty">記録がありません</td></tr>';
+    return;
+  }
+  const rowColor = d => {
+    const dw = new Date(d).getDay();
+    if (dw === 0 || isHol(+d.slice(0,4), +d.slice(5,7), +d.slice(8,10))) return 'background:#fff0f0';
+    if (dw === 6) return 'background:#f0f4ff';
+    return '';
+  };
+  tbody.innerHTML = list.map(r => {
+    const dw = new Date(r.date).getDay();
+    const dwStr = WD[dw];
+    return `<tr style="${rowColor(r.date)}">
+      <td style="font-weight:600;white-space:nowrap">${r.date}</td>
+      <td><span class="badge badge-${dw===0||dw===6?'high':'gray'}">${dwStr}</span></td>
+      <td style="font-weight:600;color:var(--blue)">${r.in_time||'－'}</td>
+      <td>${r.in_person_id ? empName(r.in_person_id) : (r.in_person_free||'－')}</td>
+      <td style="font-weight:600;color:var(--navy)">${r.out_time||'－'}</td>
+      <td>${r.out_person_id ? empName(r.out_person_id) : (r.out_person_free||'－')}</td>
+      <td style="font-size:11px;color:var(--gray)">${r.note||''}</td>
+      <td><button class="btn btn-secondary btn-sm" onclick="openAccessModal('${r.id}')">編集</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function openAccessModal(id) {
+  const active = activeEmps();
+  const opts = '<option value="">－</option>' + active.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+  document.getElementById('accessInPerson').innerHTML = opts;
+  document.getElementById('accessOutPerson').innerHTML = opts;
+
+  if (id) {
+    const r = accessLogs.find(r => r.id === id);
+    if (!r) return;
+    document.getElementById('accessModalTitle').textContent = '入退室記録を編集';
+    document.getElementById('accessId').value = r.id;
+    document.getElementById('accessDate').value = r.date;
+    document.getElementById('accessInTime').value = r.in_time || '';
+    document.getElementById('accessInPerson').value = r.in_person_id || '';
+    document.getElementById('accessOutTime').value = r.out_time || '';
+    document.getElementById('accessOutPerson').value = r.out_person_id || '';
+    document.getElementById('accessNote').value = r.note || '';
+    document.getElementById('accessDeleteBtn').style.display = '';
+  } else {
+    document.getElementById('accessModalTitle').textContent = '入退室記録を追加';
+    document.getElementById('accessId').value = '';
+    document.getElementById('accessDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('accessInTime').value = '';
+    document.getElementById('accessInPerson').value = '';
+    document.getElementById('accessOutTime').value = '';
+    document.getElementById('accessOutPerson').value = '';
+    document.getElementById('accessNote').value = '';
+    document.getElementById('accessDeleteBtn').style.display = 'none';
+  }
+  openModal('accessModal');
+}
+
+async function saveAccessLog() {
+  const id = document.getElementById('accessId').value;
+  const date = document.getElementById('accessDate').value;
+  if (!date) { toast('日付を入力してください', true); return; }
+
+  const data = {
+    id: id || uuid(),
+    date,
+    in_time:  document.getElementById('accessInTime').value || null,
+    in_person_id: document.getElementById('accessInPerson').value || null,
+    out_time: document.getElementById('accessOutTime').value || null,
+    out_person_id: document.getElementById('accessOutPerson').value || null,
+    note: document.getElementById('accessNote').value.trim(),
+    created_at: now(), updated_at: now()
+  };
+
+  if (id) {
+    const idx = accessLogs.findIndex(r => r.id === id);
+    if (idx !== -1) accessLogs[idx] = data; else accessLogs.push(data);
+  } else {
+    accessLogs.push(data);
+  }
+
+  try {
+    await ghWrite('access_log.json', accessLogs);
+    closeModal('accessModal');
+    renderAccessLog();
+    await addLog(me.id, me.name, id ? 'EDIT_ACCESS' : 'ADD_ACCESS', `${date} 入退室記録`);
+    toast('✅ 保存しました');
+  } catch(e) { toast('保存エラー: ' + e.message, true); }
+}
+
+async function deleteAccessLog() {
+  const id = document.getElementById('accessId').value;
+  if (!confirm('この記録を削除しますか？')) return;
+  accessLogs = accessLogs.filter(r => r.id !== id);
+  try {
+    await ghWrite('access_log.json', accessLogs);
+    closeModal('accessModal');
+    renderAccessLog();
+    toast('🗑️ 削除しました');
+  } catch(e) { toast('削除エラー', true); }
+}
+
+function downloadAccessCSV() {
+  const ym = document.getElementById('accessYM').value;
+  let list = ym ? accessLogs.filter(r => r.date.startsWith(ym)) : accessLogs;
+  list = list.sort((a,b) => a.date.localeCompare(b.date));
+
+  const WD = ['日','月','火','水','木','金','土'];
+  const header = ['日付','曜日','入室時間','開錠者','退室時間','施錠者','備考'];
+  const rows = list.map(r => {
+    const dw = new Date(r.date).getDay();
+    return [
+      r.date, WD[dw],
+      r.in_time || '',
+      r.in_person_id ? empName(r.in_person_id) : '',
+      r.out_time || '',
+      r.out_person_id ? empName(r.out_person_id) : '',
+      r.note || ''
+    ];
+  });
+
+  const csv = [header, ...rows].map(row =>
+    row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+
+  const bom = '\uFEFF'; // Excel用BOM
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `入退室記録_${ym || '全期間'}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ════ 操作ログ ════
