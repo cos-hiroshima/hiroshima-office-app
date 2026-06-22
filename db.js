@@ -5,7 +5,8 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data', 'office.db');
+const os = require('os');
+const DB_PATH = process.env.DB_PATH || path.join(os.tmpdir(), 'office.db');
 
 let db;  // sql.js Database instance
 
