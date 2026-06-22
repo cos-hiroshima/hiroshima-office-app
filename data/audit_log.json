@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1782114016845y0c5dfz815q",
+    "emp_id": "emp001",
+    "emp_name": "西浦",
+    "action": "DELETE_EMPLOYEE",
+    "detail": "田中",
+    "created_at": "2026-06-22 07:40:16"
+  },
+  {
     "id": "id1782114008091sftcl5216wa",
     "emp_id": "emp001",
     "emp_name": "西浦",
