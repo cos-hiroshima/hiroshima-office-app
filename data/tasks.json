@@ -26,8 +26,8 @@
     "sub_assignee_id": null,
     "status": "担当未定",
     "note": "誰かが必ず確認する運用でよい",
-    "created_at": "2026-06-22 07:38:56",
-    "updated_at": "2026-06-22 07:38:56"
+    "created_at": "2026-06-22 07:38:58",
+    "updated_at": "2026-06-22 07:38:58"
   },
   {
     "id": "task003",
@@ -80,14 +80,14 @@
     "title": "オフィス清掃（週次ローテーション）",
     "description": "週次清掃の実施、担当ローテーション管理",
     "priority": "中",
+    "frequency": "週次",
     "rotation_type": "weekly",
     "assignee_id": null,
     "sub_assignee_id": null,
     "status": "担当未定",
-    "frequency": "週次",
     "note": "ペア制検討中。男子トイレ担当偏りも要検討",
-    "created_at": "2026-06-22 00:00:00",
-    "updated_at": "2026-06-22 00:00:00"
+    "created_at": "2026-06-22 07:39:30",
+    "updated_at": "2026-06-22 07:39:30"
   },
   {
     "id": "task007",
