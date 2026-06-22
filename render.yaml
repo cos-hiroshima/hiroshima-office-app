@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: hiroshima-office-app
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: /data/office.db
+    disk:
+      name: office-data
+      mountPath: /data
+      sizeGB: 1
