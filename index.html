@@ -764,38 +764,109 @@ function renderDashboard() {
       ${e.client_site ? '<span class="badge badge-mid">客先常駐</span>' : ''}
       <span style="font-size:11px;color:var(--gray);margin-left:auto">${e.note||''}</span>
     </div>`).join('');
-  // カレンダープレビュー
+  // カレンダープレビュー（全平日＋出社率）
   const att = attendance[ymStr()] || {};
-  const wdays=[]; for(let d=1;d<=Math.min(14,daysIn(calYear,calMonth));d++){const dw=dow(calYear,calMonth,d);if(dw!==0&&dw!==6&&!isHol(calYear,calMonth,d))wdays.push(d);}
+  const today = new Date(); const todayD = (calYear===today.getFullYear()&&calMonth===today.getMonth()+1)?today.getDate():daysIn(calYear,calMonth);
+  const allDays=[]; for(let d=1;d<=daysIn(calYear,calMonth);d++) allDays.push(d);
+  const wdays=allDays.filter(d=>{const dw=dow(calYear,calMonth,d);return dw!==0&&dw!==6&&!isHol(calYear,calMonth,d);});
+  const pastWdays=wdays.filter(d=>d<=todayD);
   const colors={'出社':'#d6eaf8','在宅':'#d5f5e3','休日':'#f8f9fa','有休':'#fdebd0','客先':'#e8daef'};
-  let html=`<div style="overflow-x:auto"><table class="cal-table"><tr><th class="col-name">氏名</th>`;
-  wdays.forEach(d=>{const dw=dow(calYear,calMonth,d);html+=`<th class="col-date">${d}<br>${WD_JP[dw]}</th>`;});
-  html+='</tr>';
+
+  // 出社率計算（当月の過去平日ベース）
+  function officeRate(empId){
+    if(!pastWdays.length) return null;
+    const cnt=pastWdays.filter(d=>{const st=(att[empId]||{})[d];return st==='出社'||st==='客先';}).length;
+    const denom=pastWdays.filter(d=>{const st=(att[empId]||{})[d];return st!=='有休'&&st!=='休日';}).length||pastWdays.length;
+    return Math.round(cnt/denom*100);
+  }
+
+  let calHtml=`<div style="overflow-x:auto"><table class="cal-table"><tr><th class="col-name">氏名</th><th class="col-date" style="min-width:60px;background:var(--blue)">出社率</th>`;
+  allDays.forEach(d=>{const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);const cls=hol?'col-date hol':dw===6?'col-date sat':dw===0?'col-date sun':'col-date';calHtml+=`<th class="${cls}">${d}<br>${WD_JP[dw]}</th>`;});
+  calHtml+='</tr>';
+
   active.forEach(e=>{
-    html+=`<tr><td class="row-hdr">${e.name}</td>`;
-    wdays.forEach(d=>{const st=(att[e.id]||{})[d]||null;html+=`<td class="cal-cell" style="background:${colors[st]||'#fff'}">${STATUS_LBL[st]||'－'}</td>`;});
-    html+='</tr>';
+    const rate=officeRate(e.id);
+    const rateColor=rate===null?'#aaa':rate>=80?'var(--green)':rate>=50?'var(--amber)':'var(--red)';
+    calHtml+=`<tr><td class="row-hdr">${e.name}</td><td style="text-align:center;font-weight:700;font-size:13px;color:${rateColor}">${rate===null?'－':rate+'%'}</td>`;
+    allDays.forEach(d=>{
+      const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
+      let st=(att[e.id]||{})[d]||null;
+      if(!st&&(dw===0||dw===6||hol))st='休日';
+      calHtml+=`<td class="cal-cell s-${st||'null'}">${STATUS_LBL[st]||'－'}</td>`;
+    });
+    calHtml+='</tr>';
   });
-  html+=`<tr class="cnt-row"><td class="col-name">出社人数</td>`;
-  wdays.forEach(d=>{const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;html+=`<td class="${cnt<2?'cnt-alert':''}">${cnt}</td>`;});
-  html+='</tr></table></div>';
-  document.getElementById('dashCalPreview').innerHTML = html;
+
+  calHtml+=`<tr class="cnt-row"><td class="col-name">出社人数</td><td></td>`;
+  allDays.forEach(d=>{const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);if(dw===0||dw===6||hol){calHtml+='<td style="background:#f0f0f0;color:#ccc">－</td>';return;}const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;calHtml+=`<td class="${cnt<2?'cnt-alert':''}">${cnt}</td>`;});
+  calHtml+='</tr></table></div>';
+  document.getElementById('dashCalPreview').innerHTML = calHtml;
 }
 
 // ════ カレンダー ════
 function renderCalendar() {
   document.getElementById('calMonthLabel').textContent = `${calYear}年 ${calMonth}月`;
   const ym = ymStr(), att = attendance[ym] || {}, active = activeEmps(), days = daysIn(calYear, calMonth);
-  let html=`<table class="cal-table"><tr><th class="col-name">氏名</th>`;
-  for(let d=1;d<=days;d++){const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);const cls=hol?'col-date hol':dw===6?'col-date sat':dw===0?'col-date sun':'col-date';html+=`<th class="${cls}">${d}<br>${WD_JP[dw]}</th>`;}
+  const today = new Date(); const todayD = (calYear===today.getFullYear()&&calMonth===today.getMonth()+1)?today.getDate():days;
+
+  // 出社率計算（平日ベース）
+  const allDays=[]; for(let d=1;d<=days;d++) allDays.push(d);
+  const wdays=allDays.filter(d=>{const dw=dow(calYear,calMonth,d);return dw!==0&&dw!==6&&!isHol(calYear,calMonth,d);});
+  const pastWdays=wdays.filter(d=>d<=todayD);
+
+  function empRate(empId){
+    if(!pastWdays.length) return null;
+    const out=pastWdays.filter(d=>{const st=(att[empId]||{})[d];return st==='出社'||st==='客先';}).length;
+    const wk=pastWdays.filter(d=>{const st=(att[empId]||{})[d];return st!=='有休'&&st!=='休日';}).length||pastWdays.length;
+    return Math.round(out/wk*100);
+  }
+  function rateColor(r){return r===null?'#aaa':r>=80?'var(--green)':r>=50?'var(--amber)':'var(--red)';}
+
+  let html=`<table class="cal-table" style="min-width:${60+60+44*days}px"><tr>`;
+  html+=`<th class="col-name" style="min-width:80px">氏名</th>`;
+  html+=`<th class="col-date" style="min-width:60px;background:var(--blue)">出社率</th>`;
+  for(let d=1;d<=days;d++){
+    const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
+    const cls=hol?'col-date hol':dw===6?'col-date sat':dw===0?'col-date sun':'col-date';
+    const today_mark=(d===todayD&&calYear===today.getFullYear()&&calMonth===today.getMonth()+1)?'border-bottom:3px solid #f39c12':''
+    html+=`<th class="${cls}" style="${today_mark}">${d}<br>${WD_JP[dw]}</th>`;
+  }
   html+='</tr>';
+
   active.forEach(e=>{
-    html+=`<tr><td class="row-hdr">${e.name}${e.client_site?'<span style="font-size:10px;background:var(--amber2);color:var(--amber);border-radius:4px;padding:1px 5px;margin-left:4px">客先</span>':''}</td>`;
-    for(let d=1;d<=days;d++){const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);let st=(att[e.id]||{})[d]||null;if(!st&&(dw===0||dw===6||hol))st='休日';html+=`<td class="cal-cell s-${st||'null'}" onclick="cycleStatus('${e.id}',${d})">${STATUS_LBL[st]||'－'}</td>`;}
+    const rate=empRate(e.id);
+    html+=`<tr>
+      <td class="row-hdr">${e.name}${e.client_site?'<span style="font-size:9px;background:var(--amber2);color:var(--amber);border-radius:3px;padding:1px 4px;margin-left:3px">客先</span>':''}</td>
+      <td style="text-align:center;font-weight:700;font-size:13px;color:${rateColor(rate)};background:#f8f9fa">${rate===null?'－':rate+'%'}</td>`;
+    for(let d=1;d<=days;d++){
+      const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
+      let st=(att[e.id]||{})[d]||null;
+      if(!st&&(dw===0||dw===6||hol))st='休日';
+      html+=`<td class="cal-cell s-${st||'null'}" onclick="cycleStatus('${e.id}',${d})" title="${e.name} ${d}日: ${st||'未入力'}">${STATUS_LBL[st]||'－'}</td>`;
+    }
     html+='</tr>';
   });
-  html+=`<tr class="cnt-row"><td class="col-name">出社人数</td>`;
-  for(let d=1;d<=days;d++){const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);if(dw===0||dw===6||hol){html+='<td style="background:#f8f9fa;color:#bdc3c7">－</td>';continue;}const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;html+=`<td class="${cnt<2?'cnt-alert':''}">${cnt}</td>`;}
+
+  // 出社人数行
+  html+=`<tr class="cnt-row"><td class="col-name">出社人数</td><td></td>`;
+  for(let d=1;d<=days;d++){
+    const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
+    if(dw===0||dw===6||hol){html+='<td style="background:#f0f0f0;color:#ccc">－</td>';continue;}
+    const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;
+    html+=`<td class="${cnt<2?'cnt-alert':''}">${cnt}</td>`;
+  }
+  html+='</tr>';
+
+  // 出社率行（平日のみ）
+  html+=`<tr style="background:#e8f4fd"><td class="col-name" style="font-size:11px;font-weight:700;color:var(--blue)">出社率</td><td></td>`;
+  for(let d=1;d<=days;d++){
+    const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
+    if(dw===0||dw===6||hol||d>todayD){html+=`<td style="background:#f0f0f0;color:#ccc;font-size:11px">－</td>`;continue;}
+    const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;
+    const denom=active.filter(e=>{const st=(att[e.id]||{})[d];return !st||st==='出社'||st==='在宅'||st==='客先';}).length||active.length;
+    const r=Math.round(cnt/denom*100);
+    html+=`<td style="font-size:11px;font-weight:700;color:${r>=50?'var(--blue)':'var(--red)'};background:#e8f4fd">${r}%</td>`;
+  }
   html+='</tr></table>';
   document.getElementById('calWrap').innerHTML = html;
 }
