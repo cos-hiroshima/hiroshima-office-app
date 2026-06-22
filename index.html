@@ -954,9 +954,12 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('cl
       employees=await ghRead('employees.json')||[];
       const emp=employees.find(e=>e.id===s.empId);
       if(emp&&emp.status!=='退職'){me=emp;await initApp();return;}
-    }catch(e){}
+    }catch(e){ console.warn('session restore error:', e); }
     localStorage.removeItem('hiroshima_session');
   }
+  // セッションなし or 復元失敗 → ログイン画面表示
+  switchStep('step1');
+  setTimeout(()=>{ const el=document.getElementById('loginEmpId'); if(el) el.focus(); },50);
 })();
 </script>
 </body>
