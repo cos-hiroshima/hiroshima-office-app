@@ -301,8 +301,8 @@ app.get('/api/logs', requireAuth, requireAdmin, async (req, res) => {
 
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n✅ 広島オフィス管理システム v3 起動中 (GitHub storage)`);
-  console.log(`   http://localhost:${PORT}\n`);
+  console.log(`   http://0.0.0.0:${PORT}\n`);
   if (!GH_TOKEN) console.warn('⚠️  GH_TOKEN が未設定です');
 });
