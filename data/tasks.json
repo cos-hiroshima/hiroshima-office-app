@@ -17,7 +17,7 @@
   {
     "id": "task002",
     "category": "入退室管理",
-    "title": "Teams入退室記録確認",
+    "title": "入退室記録確認",
     "description": "監査対応のため記録漏れを確認する",
     "priority": "中",
     "frequency": "月次",
@@ -26,8 +26,8 @@
     "sub_assignee_id": null,
     "status": "担当未定",
     "note": "誰かが必ず確認する運用でよい",
-    "created_at": "2026-06-22 07:38:58",
-    "updated_at": "2026-06-22 07:38:58"
+    "created_at": "2026-06-22 07:43:01",
+    "updated_at": "2026-06-22 07:43:01"
   },
   {
     "id": "task003",
