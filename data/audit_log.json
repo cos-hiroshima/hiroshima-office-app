@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "84843a96-8832-450e-af8c-d4a6b55f387e",
+    "emp_id": "emp001",
+    "emp_name": "system",
+    "action": "SETUP_PASSWORD",
+    "target": "auth",
+    "detail": "初回パスワード設定",
+    "ip": "114.160.52.96",
+    "created_at": "2026-06-22 06:00:48"
+  }
+]
