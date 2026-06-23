@@ -50,14 +50,14 @@
     "title": "出社・テレワーク状況集計",
     "description": "出社人数・テレワーク比率の確認と月次集計",
     "priority": "中",
-    "rotation_type": "monthly",
-    "assignee_id": null,
-    "sub_assignee_id": null,
-    "status": "担当未定",
     "frequency": "月次",
-    "note": "ルールを1資料に集約する方針",
-    "created_at": "2026-06-22 00:00:00",
-    "updated_at": "2026-06-22 00:00:00"
+    "rotation_type": "monthly",
+    "assignee_id": "emp001",
+    "sub_assignee_id": null,
+    "status": "確定",
+    "note": "",
+    "created_at": "2026-06-23 00:39:13",
+    "updated_at": "2026-06-23 00:39:13"
   },
   {
     "id": "task005",
