@@ -699,7 +699,7 @@ function daysIn(y,m) { return new Date(y,m,0).getDate(); }
 function dow(y,m,d) { return new Date(y,m-1,d).getDay(); }
 function isHol(y,m,d) { return HOLIDAYS.has(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`); }
 function activeEmps() { return employees.filter(e => e.status === '在籍'); }
-function empName(id) { return (employees.find(e=>e.id===id)||{}).name || '未設定'; }
+function empName(id) { if(id==='__office__') return '出社者'; if(id==='__all__') return '全員'; return (employees.find(e=>e.id===id)||{}).name || '未設定'; }
 function isAdmin() { return me?.role === 'admin'; }
 function now() { return new Date().toISOString().replace('T',' ').slice(0,19); }
 function uuid() { return 'id' + Date.now() + Math.random().toString(36).slice(2); }
@@ -1098,7 +1098,7 @@ function renderTasks() {
 
 function openTaskModal(id) {
   const active=activeEmps();
-  const opts=label=>`<option value="">-- ${label} --</option>`+active.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
+  const opts=label=>`<option value="">-- ${label} --</option><option value="__office__">出社者</option><option value="__all__">全員</option>`+active.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');
   document.getElementById('taskAssignee').innerHTML=opts('未定');
   document.getElementById('taskSubAssignee').innerHTML=opts('なし');
   const del=document.getElementById('taskDeleteBtn');
