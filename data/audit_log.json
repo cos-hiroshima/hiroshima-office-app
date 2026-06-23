@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1782175080308l09coz0pe3p",
+    "emp_id": "emp001",
+    "emp_name": "西浦",
+    "action": "EDIT_EMPLOYEE",
+    "detail": "山下",
+    "created_at": "2026-06-23 00:38:00"
+  },
+  {
     "id": "id1782174471499daaxqflpogr",
     "emp_id": "emp001",
     "emp_name": "西浦",
