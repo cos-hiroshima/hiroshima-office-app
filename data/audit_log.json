@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17821772078694y21gu6g0hx",
+    "emp_id": "emp001",
+    "emp_name": "",
+    "action": "SETUP_PASSWORD",
+    "detail": "初回パスワード設定",
+    "created_at": "2026-06-23 01:13:27"
+  },
+  {
     "id": "id17821772046611b1hob2iyooi",
     "emp_id": "emp001",
     "emp_name": "",
