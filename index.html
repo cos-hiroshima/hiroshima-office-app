@@ -914,8 +914,9 @@ function renderDashboard() {
   function officeRate(empId){
     if(!targetWdays.length) return null;
     const cnt=targetWdays.filter(d=>{const st=(att[empId]||{})[d];return st==='出社'||st==='客先';}).length;
-    const tv=targetWdays.filter(d=>{const st=(att[empId]||{})[d];return st&&st!=='有休'&&st!=='休日';}).length;
-    const denom=tv||targetWdays.length;
+    // 分母＝全平日数（未入力も含む）、有休のみ除外
+    const leave=targetWdays.filter(d=>(att[empId]||{})[d]==='有休').length;
+    const denom=targetWdays.length-leave||targetWdays.length;
     return Math.round(cnt/denom*100);
   }
 
@@ -971,8 +972,9 @@ function renderCalendar() {
   function empRate(empId){
     if(!targetWdays.length) return null;
     const out=targetWdays.filter(d=>{const st=(att[empId]||{})[d];return st==='出社'||st==='客先';}).length;
-    const tv=targetWdays.filter(d=>{const st=(att[empId]||{})[d];return st&&st!=='有休'&&st!=='休日';}).length;
-    const denom=tv||targetWdays.length;
+    // 分母＝全平日数（未入力も含む）、有休のみ除外
+    const leave=targetWdays.filter(d=>(att[empId]||{})[d]==='有休').length;
+    const denom=targetWdays.length-leave||targetWdays.length;
     return Math.round(out/denom*100);
   }
   function rateColor(r){return r===null?'#aaa':r>=80?'var(--green)':r>=50?'var(--amber)':'var(--red)';}
@@ -1440,9 +1442,11 @@ function calcEmpMonth(empId, ym, attData) {
     else if (st === '有休') leave++;
     else                   undef++;
   });
-  const working = office + remote + client; // 有休・未入力除く実働日
+  const working = office + remote + client; // 入力済み実働日（参考値）
   const total   = wdays.length;
-  const officeRate = working > 0 ? Math.round((office + client) / working * 100) : null;
+  // 分母＝全平日数 - 有休（未入力も分母に含める）
+  const denom = total - leave || total;
+  const officeRate = Math.round((office + client) / denom * 100);
   return { office, remote, client, leave, undef, total, working, officeRate };
 }
 
