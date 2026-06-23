@@ -18,7 +18,7 @@
     "id": "emp002",
     "name": "山下",
     "name_kana": "ヤマシタ",
-    "emp_type": "社員",
+    "emp_type": "リーダー",
     "status": "在籍",
     "role": "member",
     "email": "",
@@ -26,8 +26,8 @@
     "client_site": 0,
     "join_date": "2019-04-01",
     "note": "",
-    "created_at": "2026-06-22 00:00:00",
-    "updated_at": "2026-06-22 00:00:00"
+    "created_at": "2026-06-23 00:23:16",
+    "updated_at": "2026-06-23 00:23:16"
   },
   {
     "id": "emp003",
