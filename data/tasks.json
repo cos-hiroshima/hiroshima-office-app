@@ -127,12 +127,12 @@
     "priority": "低",
     "frequency": "随時（出社者対応）",
     "rotation_type": "oncall",
-    "assignee_id": null,
-    "sub_assignee_id": null,
-    "status": "担当未定",
+    "assignee_id": "__office__",
+    "sub_assignee_id": "__all__",
+    "status": "確定",
     "note": "",
-    "created_at": "2026-06-23 00:48:17",
-    "updated_at": "2026-06-23 00:48:17"
+    "created_at": "2026-06-23 00:53:33",
+    "updated_at": "2026-06-23 00:53:33"
   },
   {
     "id": "task010",
