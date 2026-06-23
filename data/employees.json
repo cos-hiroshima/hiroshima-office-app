@@ -118,5 +118,22 @@
     "note": "",
     "created_at": "2026-06-22 07:40:53",
     "updated_at": "2026-06-22 07:40:53"
+  },
+  {
+    "id": "emp011",
+    "name": "国崎",
+    "name_kana": "クニサキ",
+    "emp_type": "社員",
+    "status": "在籍",
+    "role": "member",
+    "email": "",
+    "remote_ok": 1,
+    "client_site": 0,
+    "join_date": "",
+    "note": "",
+    "created_at": "2026-06-23 00:14:37",
+    "updated_at": "2026-06-23 00:14:37",
+    "has_password": 0,
+    "last_login": null
   }
 ]
