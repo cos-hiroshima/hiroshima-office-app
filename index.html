@@ -371,7 +371,7 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
         </div>
         <div class="card"><div class="card-body" style="padding:0">
           <table class="tbl"><thead><tr>
-            <th>氏名</th><th>かな</th><th>区分</th><th>権限</th><th>状態</th><th>客先常駐</th><th>PW状態</th><th>最終ログイン</th><th>備考</th>
+            <th>氏名</th><th>かな</th><th>区分</th><th>勤務区分</th><th>権限</th><th>状態</th><th>PW状態</th><th>最終ログイン</th><th>備考</th>
             <th class="admin-only" style="width:120px">操作</th>
           </tr></thead><tbody id="empTbody"></tbody></table>
         </div></div>
@@ -466,7 +466,12 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
       </div>
       <div class="form-row" style="margin-bottom:12px">
         <div class="form-check"><input type="checkbox" id="empRemote"><label for="empRemote">テレワーク対象</label></div>
-        <div class="form-check"><input type="checkbox" id="empClient"><label for="empClient">客先常駐</label></div>
+        <div class="fg"><label>勤務区分</label>
+          <select class="fc" id="empClient">
+            <option value="0">社内勤務</option>
+            <option value="1">客先常駐</option>
+          </select>
+        </div>
       </div>
       <div class="fg"><label>備考</label><textarea class="fc" id="empNote" rows="2"></textarea></div>
     </div>
@@ -897,7 +902,7 @@ function renderDashboard() {
   active.forEach(e=>{
     const rate=officeRate(e.id);
     const rateColor=rate===null?'#aaa':rate>=80?'var(--green)':rate>=50?'var(--amber)':'var(--red)';
-    calHtml+=`<tr><td class="row-hdr">${e.name}</td><td style="text-align:center;font-weight:700;font-size:13px;color:${rateColor}">${rate===null?'－':rate+'%'}</td>`;
+    calHtml+=`<tr><td class="row-hdr">${e.name}<span style="font-size:9px;border-radius:3px;padding:1px 4px;margin-left:3px;${e.client_site?'background:var(--amber2);color:var(--amber)':'background:var(--sky);color:var(--blue)'}">${e.client_site?'客先':'社内'}</span></td><td style="text-align:center;font-weight:700;font-size:13px;color:${rateColor}">${rate===null?'－':rate+'%'}</td>`;
     allDays.forEach(d=>{
       const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
       let st=(att[e.id]||{})[d]||null;
@@ -964,7 +969,7 @@ function renderCalendar() {
   active.forEach(e=>{
     const rate=empRate(e.id);
     html+=`<tr>
-      <td class="row-hdr">${e.name}${e.client_site?'<span style="font-size:9px;background:var(--amber2);color:var(--amber);border-radius:3px;padding:1px 4px;margin-left:3px">客先</span>':''}</td>
+      <td class="row-hdr">${e.name}<span style="font-size:9px;border-radius:3px;padding:1px 4px;margin-left:3px;${e.client_site?'background:var(--amber2);color:var(--amber)':'background:var(--sky);color:var(--blue)'}">${e.client_site?'客先':'社内'}</span></td>
       <td style="text-align:center;font-weight:700;font-size:13px;color:${rateColor(rate)};background:#f8f9fa">${rate===null?'－':rate+'%'}</td>`;
     for(let d=1;d<=days;d++){
       const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
@@ -1135,11 +1140,11 @@ function renderEmployees() {
 function openEmpModal(id) {
   if(id){const e=employees.find(e=>e.id===id);if(!e)return;
     document.getElementById('empModalTitle').textContent='社員情報を編集';
-    document.getElementById('empId').value=e.id;document.getElementById('empName').value=e.name;document.getElementById('empKana').value=e.name_kana||'';document.getElementById('empType').value=e.emp_type;document.getElementById('empRole').value=e.role;document.getElementById('empStatus').value=e.status;document.getElementById('empJoinDate').value=e.join_date||'';document.getElementById('empRemote').checked=!!e.remote_ok;document.getElementById('empClient').checked=!!e.client_site;document.getElementById('empNote').value=e.note||'';
+    document.getElementById('empId').value=e.id;document.getElementById('empName').value=e.name;document.getElementById('empKana').value=e.name_kana||'';document.getElementById('empType').value=e.emp_type;document.getElementById('empRole').value=e.role;document.getElementById('empStatus').value=e.status;document.getElementById('empJoinDate').value=e.join_date||'';document.getElementById('empRemote').checked=!!e.remote_ok;document.getElementById('empClient').value=e.client_site?'1':'0';document.getElementById('empNote').value=e.note||'';
   } else {
     document.getElementById('empModalTitle').textContent='社員を追加';
     document.getElementById('empId').value='';['empName','empKana','empNote'].forEach(x=>document.getElementById(x).value='');
-    document.getElementById('empType').value='社員';document.getElementById('empRole').value='member';document.getElementById('empStatus').value='在籍';document.getElementById('empJoinDate').value='';document.getElementById('empRemote').checked=true;document.getElementById('empClient').checked=false;
+    document.getElementById('empType').value='社員';document.getElementById('empRole').value='member';document.getElementById('empStatus').value='在籍';document.getElementById('empJoinDate').value='';document.getElementById('empRemote').checked=true;document.getElementById('empClient').value='0';
   }
   openModal('empModal');
 }
@@ -1147,7 +1152,7 @@ function openEmpModal(id) {
 async function saveEmployee() {
   const id=document.getElementById('empId').value;
   const n=now();
-  const data={id:id||('emp'+Date.now()),name:document.getElementById('empName').value.trim(),name_kana:document.getElementById('empKana').value.trim(),emp_type:document.getElementById('empType').value,status:document.getElementById('empStatus').value,role:document.getElementById('empRole').value,email:'',remote_ok:document.getElementById('empRemote').checked?1:0,client_site:document.getElementById('empClient').checked?1:0,join_date:document.getElementById('empJoinDate').value,note:document.getElementById('empNote').value.trim(),created_at:n,updated_at:n,has_password:0,last_login:null};
+  const data={id:id||('emp'+Date.now()),name:document.getElementById('empName').value.trim(),name_kana:document.getElementById('empKana').value.trim(),emp_type:document.getElementById('empType').value,status:document.getElementById('empStatus').value,role:document.getElementById('empRole').value,email:'',remote_ok:document.getElementById('empRemote').checked?1:0,client_site:document.getElementById('empClient').value==='1'?1:0,join_date:document.getElementById('empJoinDate').value,note:document.getElementById('empNote').value.trim(),created_at:n,updated_at:n,has_password:0,last_login:null};
   if(!data.name){toast('氏名を入力してください',true);return;}
   if(id){const idx=employees.findIndex(e=>e.id===id);if(idx!==-1){data.has_password=employees[idx].has_password;data.last_login=employees[idx].last_login;employees[idx]=data;}else employees.push(data);}
   else{employees.push(data);const auths=await ghRead('auth.json')||[];auths.push({emp_id:data.id,password_hash:null,must_change:1,last_login:null});await ghWrite('auth.json',auths);alert(`追加しました。\n社員ID: ${data.id}\n初回ログイン時にパスワードを設定します。`);}
