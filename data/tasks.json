@@ -140,14 +140,14 @@
     "title": "サーバー室・社内資産確認",
     "description": "社内資産管理（プロジェクト検証機とは分けて管理）",
     "priority": "中",
+    "frequency": "月次",
     "rotation_type": "fixed",
     "assignee_id": null,
     "sub_assignee_id": null,
     "status": "担当未定",
-    "frequency": "月次",
     "note": "",
-    "created_at": "2026-06-22 00:00:00",
-    "updated_at": "2026-06-22 00:00:00"
+    "created_at": "2026-06-23 01:14:07",
+    "updated_at": "2026-06-23 01:14:07"
   },
   {
     "id": "task011",
