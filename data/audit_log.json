@@ -1,5 +1,13 @@
 [
   {
+    "id": "id178217423544963fb4nr6j0u",
+    "emp_id": "emp001",
+    "emp_name": "西浦",
+    "action": "EDIT_EMPLOYEE",
+    "detail": "クニサキ",
+    "created_at": "2026-06-23 00:23:55"
+  },
+  {
     "id": "id17821742130879nfqesez1h",
     "emp_id": "emp001",
     "emp_name": "西浦",
