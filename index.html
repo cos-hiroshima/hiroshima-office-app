@@ -559,8 +559,50 @@ const STATUS_CYCLE = ['出社','在宅','休日','有休','客先'];
 const STATUS_LBL   = {'出社':'出','在宅':'在','休日':'休','有休':'有','客先':'客'};
 const WD_JP = ['日','月','火','水','木','金','土'];
 const PRIO  = {'高':0,'中':1,'低':2};
-const HOLIDAYS = new Set(['2026-01-01','2026-01-12','2026-02-11','2026-02-23','2026-03-20','2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23','2026-10-12','2026-11-03','2026-11-23']);
+const HOLIDAYS = new Set([
+  // 2025年
+  '2025-01-01','2025-01-13','2025-02-11','2025-02-23','2025-02-24',
+  '2025-03-20','2025-04-29','2025-05-03','2025-05-04','2025-05-05','2025-05-06',
+  '2025-07-21','2025-08-11','2025-09-15','2025-09-22','2025-09-23',
+  '2025-10-13','2025-11-03','2025-11-23','2025-11-24',
+  // 2026年
+  '2026-01-01','2026-01-12','2026-02-11','2026-02-23',
+  '2026-03-20','2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-05-06',
+  '2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23',
+  '2026-10-12','2026-11-03','2026-11-23','2026-11-24',
+  // 2027年
+  '2027-01-01','2027-01-11','2027-02-11','2027-02-23',
+  '2027-03-21','2027-03-22','2027-04-29','2027-05-03','2027-05-04','2027-05-05',
+  '2027-07-19','2027-08-11','2027-09-20','2027-09-23',
+  '2027-10-11','2027-11-03','2027-11-23'
+]);
 
+const HOL_NAMES = {
+  '2025-01-01':'元日','2025-01-13':'成人の日','2025-02-11':'建国記念の日',
+  '2025-02-23':'天皇誕生日','2025-02-24':'振替休日','2025-03-20':'春分の日',
+  '2025-04-29':'昭和の日','2025-05-03':'憲法記念日','2025-05-04':'みどりの日',
+  '2025-05-05':'こどもの日','2025-05-06':'振替休日','2025-07-21':'海の日',
+  '2025-08-11':'山の日','2025-09-15':'敬老の日','2025-09-22':'秋分の日',
+  '2025-09-23':'振替休日','2025-10-13':'スポーツの日','2025-11-03':'文化の日',
+  '2025-11-23':'勤労感謝の日','2025-11-24':'振替休日',
+  '2026-01-01':'元日','2026-01-12':'成人の日','2026-02-11':'建国記念の日',
+  '2026-02-23':'天皇誕生日','2026-03-20':'春分の日','2026-04-29':'昭和の日',
+  '2026-05-03':'憲法記念日','2026-05-04':'みどりの日','2026-05-05':'こどもの日',
+  '2026-05-06':'振替休日','2026-07-20':'海の日','2026-08-11':'山の日',
+  '2026-09-21':'敬老の日','2026-09-22':'国民の休日','2026-09-23':'秋分の日',
+  '2026-10-12':'スポーツの日','2026-11-03':'文化の日','2026-11-23':'勤労感謝の日',
+  '2026-11-24':'振替休日',
+  '2027-01-01':'元日','2027-01-11':'成人の日','2027-02-11':'建国記念の日',
+  '2027-02-23':'天皇誕生日','2027-03-21':'春分の日','2027-03-22':'振替休日',
+  '2027-04-29':'昭和の日','2027-05-03':'憲法記念日','2027-05-04':'みどりの日',
+  '2027-05-05':'こどもの日','2027-07-19':'海の日','2027-08-11':'山の日',
+  '2027-09-20':'敬老の日','2027-09-23':'秋分の日','2027-10-11':'スポーツの日',
+  '2027-11-03':'文化の日','2027-11-23':'勤労感謝の日'
+};
+function holName(y,m,d){
+  const k=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  return HOL_NAMES[k]||null;
+}
 function toast(msg, err=false) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.className = 'show' + (err ? ' error' : '');
@@ -804,12 +846,24 @@ function renderDashboard() {
   calHtml+=`<tr class="cnt-row"><td class="col-name">出社人数</td><td></td>`;
   allDays.forEach(d=>{const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);if(dw===0||dw===6||hol){calHtml+='<td style="background:#f0f0f0;color:#ccc">－</td>';return;}const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;calHtml+=`<td class="${cnt<2?'cnt-alert':''}">${cnt}</td>`;});
   calHtml+='</tr></table></div>';
-  document.getElementById('dashCalPreview').innerHTML = calHtml;
+  document.getElementById('dashCalPreview').innerHTML =
+    `<div style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;letter-spacing:.05em">${calYear}年 ${(window.MONTH_JP||["","1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"])[calMonth]}</div>` + calHtml;
 }
 
 // ════ カレンダー ════
 function renderCalendar() {
   document.getElementById('calMonthLabel').textContent = `${calYear}年 ${calMonth}月`;
+  // カレンダー上部にも大きく年月を表示
+  let calTitle = document.getElementById('calPageTitle');
+  if(!calTitle){
+    calTitle = document.createElement('div');
+    calTitle.id = 'calPageTitle';
+    calTitle.style.cssText = 'font-size:22px;font-weight:800;color:var(--navy);letter-spacing:.05em;margin-bottom:10px;padding:4px 0 8px;border-bottom:2px solid var(--navy);';
+    const calWrap = document.getElementById('calWrap');
+    calWrap.parentNode.insertBefore(calTitle, calWrap);
+  }
+  if(!window.MONTH_JP) window.MONTH_JP=['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  calTitle.textContent = `${calYear}年 ${MONTH_JP[calMonth]}`;
   const ym = ymStr(), att = attendance[ym] || {}, active = activeEmps(), days = daysIn(calYear, calMonth);
   const today = new Date(); const todayD = (calYear===today.getFullYear()&&calMonth===today.getMonth()+1)?today.getDate():days;
 
@@ -836,8 +890,10 @@ function renderCalendar() {
   for(let d=1;d<=days;d++){
     const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
     const cls=hol?'col-date hol':dw===6?'col-date sat':dw===0?'col-date sun':'col-date';
-    const today_mark=(d===todayD&&calYear===today.getFullYear()&&calMonth===today.getMonth()+1)?'border-bottom:3px solid #f39c12':''
-    html+=`<th class="${cls}" style="${today_mark}">${d}<br>${WD_JP[dw]}</th>`;
+    const today_mark=(d===todayD&&calYear===today.getFullYear()&&calMonth===today.getMonth()+1)?'border-bottom:3px solid #f39c12':'';
+    const hn=holName(calYear,calMonth,d);
+    const holLabel=hn?`<div style="font-size:8px;opacity:.9;white-space:nowrap;overflow:hidden;max-width:42px;text-overflow:ellipsis">${hn}</div>`:'';
+    html+=`<th class="${cls}" style="${today_mark}" title="${hn||''}">${d}<br>${WD_JP[dw]}${holLabel}</th>`;
   }
   html+='</tr>';
 
