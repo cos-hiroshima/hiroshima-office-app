@@ -102,6 +102,7 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
 .cal-cell.s-有休{background:#fdebd0;color:#935116}
 .cal-cell.s-客先{background:#e8daef;color:#6c3483}
 .cal-cell.s-null{background:#fff;color:#dde}
+.cal-cell.s-未入力{background:#fff;color:#ccc}
 .cnt-row td{background:var(--sky2);font-size:11px;font-weight:700;color:var(--blue)}
 .cnt-row .col-name{background:var(--sky);color:var(--navy);font-size:11px}
 .cnt-alert{background:var(--red2)!important;color:var(--red)!important}
@@ -285,7 +286,8 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
               <div class="legend-item"><div class="legend-dot" style="background:#f8f9fa"></div>休日</div>
               <div class="legend-item"><div class="legend-dot" style="background:#fdebd0"></div>有休</div>
               <div class="legend-item"><div class="legend-dot" style="background:#e8daef"></div>客先</div>
-              <span style="margin-left:auto;font-size:11px;color:var(--gray)">セルをクリックして変更</span>
+              <div class="legend-item"><div class="legend-dot" style="background:#fff;border:1px solid #ddd"></div>未入力</div>
+              <span style="margin-left:auto;font-size:11px;color:var(--gray)">セルをクリックして変更（未入力まで回すと空白に戻ります）</span>
             </div>
             <div class="cal-wrap" id="calWrap"></div>
           </div>
@@ -555,8 +557,8 @@ let employees = [], tasks = [], attendance = {}, logsData = [];
 let calYear = new Date().getFullYear(), calMonth = new Date().getMonth() + 1;
 let bulkSel = {};
 
-const STATUS_CYCLE = ['出社','在宅','休日','有休','客先'];
-const STATUS_LBL   = {'出社':'出','在宅':'在','休日':'休','有休':'有','客先':'客'};
+const STATUS_CYCLE = ['出社','在宅','休日','有休','客先','未入力'];
+const STATUS_LBL   = {'出社':'出','在宅':'在','休日':'休','有休':'有','客先':'客','未入力':'－'};
 const WD_JP = ['日','月','火','水','木','金','土'];
 const PRIO  = {'高':0,'中':1,'低':2};
 const HOLIDAYS = new Set([
@@ -941,7 +943,11 @@ async function cycleStatus(empId, day) {
   if (!attendance[ym][empId]) attendance[ym][empId] = {};
   const cur = attendance[ym][empId][day] || null;
   const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(cur)+1) % STATUS_CYCLE.length];
-  attendance[ym][empId][day] = next;
+  if (next === '未入力') {
+    delete attendance[ym][empId][day];
+  } else {
+    attendance[ym][empId][day] = next;
+  }
   renderCalendar();
   try {
     await ghWrite('attendance.json', attendance);
