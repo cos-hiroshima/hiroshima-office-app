@@ -125,14 +125,14 @@
     "title": "保険証・郵便物の受領・保管",
     "description": "受領後の本人連絡、金庫保管",
     "priority": "低",
+    "frequency": "随時（出社者対応）",
     "rotation_type": "oncall",
     "assignee_id": null,
     "sub_assignee_id": null,
     "status": "担当未定",
-    "frequency": "随時（出社者対応）",
     "note": "",
-    "created_at": "2026-06-22 00:00:00",
-    "updated_at": "2026-06-22 00:00:00"
+    "created_at": "2026-06-23 00:48:17",
+    "updated_at": "2026-06-23 00:48:17"
   },
   {
     "id": "task010",
