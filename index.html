@@ -293,6 +293,7 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
       <div class="nav-item" data-page="calendar" onclick="navigate('calendar')"><span>📅</span>出社・在宅カレンダー</div>
       <div class="nav-item" data-page="tasks" onclick="navigate('tasks')"><span>📋</span>庶務業務管理<span class="nav-badge" id="unassignedBadge" style="display:none"></span></div>
       <div class="nav-item" data-page="access" onclick="navigate('access')"><span>🚪</span>入退室記録管理</div>
+      <div class="nav-item" data-page="summary" onclick="navigate('summary')"><span>📈</span>出社・テレワーク集計</div>
       <div class="nav-item" data-page="employees" onclick="navigate('employees')"><span>👥</span>社員マスタ</div>
       <div class="nav-item admin-only" data-page="logs" onclick="navigate('logs')" style="display:none"><span>📜</span>操作ログ</div>
     </div>
@@ -405,6 +406,27 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
                 <tbody id="accessTbody"></tbody>
               </table>
             </div>
+          </div>
+        </div>
+      </div>
+      <!-- 出社テレワーク集計 -->
+      <div class="page" id="page-summary">
+        <div class="card">
+          <div class="card-header">
+            <h3>📈 出社・テレワーク状況集計</h3>
+            <div class="hdr-actions">
+              <button class="btn btn-secondary btn-sm" onclick="downloadSummaryCSV()">📥 CSVダウンロード</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="search-box" style="margin-bottom:14px">
+              <label style="font-size:12px;font-weight:600;color:var(--text)">集計期間：</label>
+              <input type="month" class="fc" id="summaryFrom" style="width:150px">
+              <span style="font-size:13px;color:var(--gray)">〜</span>
+              <input type="month" class="fc" id="summaryTo" style="width:150px">
+              <button class="btn btn-primary btn-sm" onclick="calcSummary()">📊 集計する</button>
+            </div>
+            <div id="summaryResult"></div>
           </div>
         </div>
       </div>
@@ -819,6 +841,7 @@ const PAGE_META = {
   tasks:     ['庶務業務管理','担当割当・タスク一覧'],
   employees: ['社員マスタ','社員情報の登録・編集・削除'],
   access:    ['入退室記録管理','入室・退室の記録'],
+  summary:   ['出社・テレワーク集計','月別・個人別出社率'],
   logs:      ['操作ログ','操作履歴'],
 };
 function toggleSidebar() {
@@ -844,6 +867,7 @@ function navigate(page) {
   if (page==='employees') renderEmployees();
   if (page==='logs')      loadLogs();
   if (page==='access')    initAccessPage();
+  if (page==='summary')   initSummaryPage();
 }
 
 // ════ ダッシュボード ════
@@ -1362,6 +1386,208 @@ function downloadAccessCSV() {
   a.href = url;
   a.download = `入退室記録_${ym || '全期間'}.csv`;
   a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ════ 出社・テレワーク集計 ════
+function initSummaryPage() {
+  const today = new Date();
+  const y = today.getFullYear(), m = today.getMonth() + 1;
+  // デフォルト：今年の1月〜今月
+  const from = `${y}-01`;
+  const to   = `${y}-${String(m).padStart(2,'0')}`;
+  const fEl = document.getElementById('summaryFrom');
+  const tEl = document.getElementById('summaryTo');
+  if (!fEl.value) fEl.value = from;
+  if (!tEl.value) tEl.value = to;
+  document.getElementById('summaryResult').innerHTML = '<div class="empty">期間を選択して「集計する」をクリックしてください</div>';
+}
+
+// 指定期間の全月リストを生成
+function monthsBetween(from, to) {
+  const months = [];
+  let [fy, fm] = from.split('-').map(Number);
+  const [ty, tm] = to.split('-').map(Number);
+  while (fy < ty || (fy === ty && fm <= tm)) {
+    months.push(`${fy}-${String(fm).padStart(2,'0')}`);
+    fm++; if (fm > 12) { fm = 1; fy++; }
+  }
+  return months;
+}
+
+// 月の平日リスト
+function getWorkdays(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  const days = daysIn(y, m), wdays = [];
+  for (let d = 1; d <= days; d++) {
+    const dw = dow(y, m, d);
+    if (dw !== 0 && dw !== 6 && !isHol(y, m, d)) wdays.push(d);
+  }
+  return wdays;
+}
+
+// 1人1月の集計
+function calcEmpMonth(empId, ym, attData) {
+  const att = (attData[ym] || {})[empId] || {};
+  const wdays = getWorkdays(ym);
+  if (!wdays.length) return null;
+  let office = 0, remote = 0, client = 0, leave = 0, undef = 0;
+  wdays.forEach(d => {
+    const st = att[d] || null;
+    if (st === '出社')      office++;
+    else if (st === '在宅') remote++;
+    else if (st === '客先') client++;
+    else if (st === '有休') leave++;
+    else                   undef++;
+  });
+  const working = office + remote + client; // 有休・未入力除く実働日
+  const total   = wdays.length;
+  const officeRate = working > 0 ? Math.round((office + client) / working * 100) : null;
+  return { office, remote, client, leave, undef, total, working, officeRate };
+}
+
+async function calcSummary() {
+  const from = document.getElementById('summaryFrom').value;
+  const to   = document.getElementById('summaryTo').value;
+  if (!from || !to) { toast('期間を入力してください', true); return; }
+  if (from > to)    { toast('開始月が終了月より後になっています', true); return; }
+
+  const el = document.getElementById('summaryResult');
+  el.innerHTML = '<div class="empty">集計中…</div>';
+
+  // attendance.json を再取得
+  const attData = await ghRead('attendance.json') || {};
+  const months  = monthsBetween(from, to);
+  const active  = activeEmps();
+
+  // ── 全社員×全月の集計マトリクス ──
+  const MONTH_JP2 = ['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+  // ─ テーブル構築 ─
+  let html = `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">`;
+  html += `<table class="tbl" style="min-width:${200+120*months.length}px;font-size:12px">`;
+
+  // ヘッダー
+  html += `<thead><tr>
+    <th rowspan="2" style="min-width:80px;vertical-align:middle">氏名</th>
+    <th rowspan="2" style="min-width:80px;vertical-align:middle">勤務区分</th>`;
+  months.forEach(ym => {
+    const [y, m] = ym.split('-').map(Number);
+    html += `<th colspan="2" style="text-align:center;min-width:110px">${y}年${MONTH_JP2[m]}</th>`;
+  });
+  html += `<th colspan="2" style="text-align:center;min-width:110px;background:#1a4a6e">期間合計</th>`;
+  html += `</tr><tr>`;
+  months.forEach(() => {
+    html += `<th style="font-size:10px;background:#2a5a7e">出社率</th><th style="font-size:10px;background:#2a5a7e">出社/在宅/客先/有休</th>`;
+  });
+  html += `<th style="font-size:10px;background:#1a4a6e">出社率</th><th style="font-size:10px;background:#1a4a6e">出社/在宅/客先/有休</th>`;
+  html += `</tr></thead><tbody>`;
+
+  // 各社員行
+  active.forEach(e => {
+    let totalOffice=0, totalRemote=0, totalClient=0, totalLeave=0, totalWorking=0;
+    const monthCells = months.map(ym => {
+      const r = calcEmpMonth(e.id, ym, attData);
+      if (!r) return `<td>－</td><td style="font-size:11px;color:var(--gray)">－</td>`;
+      totalOffice  += r.office;
+      totalRemote  += r.remote;
+      totalClient  += r.client;
+      totalLeave   += r.leave;
+      totalWorking += r.working;
+      const rateColor = r.officeRate === null ? '#aaa' : r.officeRate >= 80 ? 'var(--green)' : r.officeRate >= 50 ? 'var(--amber)' : 'var(--red)';
+      const rateStr = r.officeRate === null ? '－' : r.officeRate + '%';
+      const detail = `${r.office}/${r.remote}/${r.client}/${r.leave}`;
+      return `<td style="text-align:center;font-weight:700;color:${rateColor}">${rateStr}</td>
+              <td style="text-align:center;font-size:11px;color:var(--text2)">${detail}</td>`;
+    });
+    const totalRate = totalWorking > 0 ? Math.round((totalOffice + totalClient) / totalWorking * 100) : null;
+    const totalRateColor = totalRate === null ? '#aaa' : totalRate >= 80 ? 'var(--green)' : totalRate >= 50 ? 'var(--amber)' : 'var(--red)';
+    const totalRateStr = totalRate === null ? '－' : totalRate + '%';
+    const totalDetail = `${totalOffice}/${totalRemote}/${totalClient}/${totalLeave}`;
+
+    html += `<tr>
+      <td style="font-weight:600">${e.name}</td>
+      <td><span class="badge badge-${e.client_site ? 'mid' : 'blue'}">${e.client_site ? '客先常駐' : '社内勤務'}</span></td>
+      ${monthCells.join('')}
+      <td style="text-align:center;font-weight:700;font-size:14px;color:${totalRateColor};background:#f0f4ff">${totalRateStr}</td>
+      <td style="text-align:center;font-size:11px;color:var(--text2);background:#f0f4ff">${totalDetail}</td>
+    </tr>`;
+  });
+
+  // 月別平均行
+  html += `<tr style="background:#e8f4fd;font-weight:700">
+    <td colspan="2" style="font-size:12px;color:var(--blue)">月平均出社率</td>`;
+  let grandOffice=0, grandRemote=0, grandClient=0, grandLeave=0, grandWorking=0;
+  months.forEach(ym => {
+    let mo=0, mr=0, mc=0, ml=0, mw=0;
+    active.forEach(e => {
+      const r = calcEmpMonth(e.id, ym, attData);
+      if (r) { mo+=r.office; mr+=r.remote; mc+=r.client; ml+=r.leave; mw+=r.working; }
+    });
+    grandOffice+=mo; grandRemote+=mr; grandClient+=mc; grandLeave+=ml; grandWorking+=mw;
+    const avg = mw > 0 ? Math.round((mo+mc)/mw*100) : null;
+    const avgColor = avg===null?'#aaa':avg>=80?'var(--green)':avg>=50?'var(--amber)':'var(--red)';
+    html += `<td style="text-align:center;color:${avgColor}">${avg===null?'－':avg+'%'}</td>
+             <td style="text-align:center;font-size:11px;color:var(--text2)">${mo}/${mr}/${mc}/${ml}</td>`;
+  });
+  const grandAvg = grandWorking > 0 ? Math.round((grandOffice+grandClient)/grandWorking*100) : null;
+  const grandColor = grandAvg===null?'#aaa':grandAvg>=80?'var(--green)':grandAvg>=50?'var(--amber)':'var(--red)';
+  html += `<td style="text-align:center;font-size:14px;color:${grandColor};background:#d6eaf8">${grandAvg===null?'－':grandAvg+'%'}</td>
+           <td style="text-align:center;font-size:11px;color:var(--text2);background:#d6eaf8">${grandOffice}/${grandRemote}/${grandClient}/${grandLeave}</td>`;
+  html += `</tr></tbody></table></div>`;
+
+  // 凡例
+  html += `<div style="margin-top:10px;font-size:11px;color:var(--gray)">
+    ※ 出社率 ＝（出社＋客先）÷ 実働日数（有休・未入力除く）　
+    内訳表示：出社日数／在宅日数／客先日数／有休日数
+    <span style="color:var(--green);font-weight:700;margin-left:12px">■ 80%以上</span>
+    <span style="color:var(--amber);font-weight:700;margin-left:8px">■ 50〜79%</span>
+    <span style="color:var(--red);font-weight:700;margin-left:8px">■ 50%未満</span>
+  </div>`;
+
+  el.innerHTML = html;
+
+  // CSVダウンロード用にデータを保持
+  window._summaryData = { months, active, attData };
+}
+
+function downloadSummaryCSV() {
+  const from = document.getElementById('summaryFrom').value;
+  const to   = document.getElementById('summaryTo').value;
+  if (!window._summaryData) { toast('先に集計してください', true); return; }
+  const { months, active, attData } = window._summaryData;
+  const MONTH_JP2 = ['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+  const header = ['氏名', '勤務区分'];
+  months.forEach(ym => {
+    const [y, m] = ym.split('-').map(Number);
+    const label = `${y}年${MONTH_JP2[m]}`;
+    header.push(`${label}_出社率`, `${label}_出社日`, `${label}_在宅日`, `${label}_客先日`, `${label}_有休日`, `${label}_平日数`);
+  });
+  header.push('期間_出社率', '期間_出社日', '期間_在宅日', '期間_客先日', '期間_有休日');
+
+  const rows = active.map(e => {
+    const row = [e.name, e.client_site ? '客先常駐' : '社内勤務'];
+    let totalO=0, totalR=0, totalC=0, totalL=0, totalW=0;
+    months.forEach(ym => {
+      const r = calcEmpMonth(e.id, ym, attData);
+      if (r) {
+        totalO+=r.office; totalR+=r.remote; totalC+=r.client; totalL+=r.leave; totalW+=r.working;
+        row.push(r.officeRate === null ? '' : r.officeRate + '%', r.office, r.remote, r.client, r.leave, r.total);
+      } else {
+        row.push('', '', '', '', '', '');
+      }
+    });
+    const totalRate = totalW > 0 ? Math.round((totalO+totalC)/totalW*100) : '';
+    row.push(totalRate === '' ? '' : totalRate + '%', totalO, totalR, totalC, totalL);
+    return row;
+  });
+
+  const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `出社テレワーク集計_${from}_${to}.csv`; a.click();
   URL.revokeObjectURL(url);
 }
 
