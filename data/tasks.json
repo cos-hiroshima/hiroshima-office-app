@@ -155,13 +155,13 @@
     "title": "突発・個別対応の報告・判断",
     "description": "突発対応・個別依頼の受付、報告先への連絡",
     "priority": "中",
+    "frequency": "随時",
     "rotation_type": "fixed",
     "assignee_id": "emp001",
-    "sub_assignee_id": null,
-    "status": "仮決定",
-    "frequency": "随時",
+    "sub_assignee_id": "emp010",
+    "status": "確定",
     "note": "判断基準の明文化が必要",
-    "created_at": "2026-06-22 00:00:00",
-    "updated_at": "2026-06-22 00:00:00"
+    "created_at": "2026-06-23 00:56:35",
+    "updated_at": "2026-06-23 00:56:35"
   }
 ]
