@@ -130,9 +130,9 @@
     "assignee_id": "__office__",
     "sub_assignee_id": "__all__",
     "status": "確定",
-    "note": "",
-    "created_at": "2026-06-23 00:53:33",
-    "updated_at": "2026-06-23 00:53:33"
+    "note": "個人に受け渡し必要な郵便物等を受領した場合には、SLACKにて通知",
+    "created_at": "2026-06-23 00:54:18",
+    "updated_at": "2026-06-23 00:54:18"
   },
   {
     "id": "task010",
