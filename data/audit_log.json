@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17824324353307hhz3keia4b",
+    "emp_id": "emp010",
+    "emp_name": "陶山",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "陶山 2026-06/26→出社",
+    "created_at": "2026-06-26 00:07:15"
+  },
+  {
     "id": "id17824324218503v3h8b5tq56",
     "emp_id": "emp010",
     "emp_name": "陶山",
