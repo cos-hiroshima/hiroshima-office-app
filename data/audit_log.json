@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1783044942343w80qzjqzxag",
+    "emp_id": "emp001",
+    "emp_name": "西浦",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-07-03 02:15:42"
+  },
+  {
     "id": "id1783044805626jj8u508ojxf",
     "emp_id": "emp001",
     "emp_name": "西浦",
