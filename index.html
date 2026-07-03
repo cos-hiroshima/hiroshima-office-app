@@ -296,6 +296,7 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
       <div class="nav-item" data-page="summary" onclick="navigate('summary')"><span>📈</span>出社・テレワーク集計</div>
       <div class="nav-item" data-page="employees" onclick="navigate('employees')"><span>👥</span>社員マスタ</div>
       <div class="nav-item" data-page="assets" onclick="navigate('assets')"><span>🖥️</span>社内資産管理</div>
+      <div class="nav-item" data-page="iplist" onclick="navigate('iplist')"><span>🌐</span>IP管理表</div>
       <div class="nav-item admin-only" data-page="logs" onclick="navigate('logs')" style="display:none"><span>📜</span>操作ログ</div>
     </div>
     <div class="sidebar-user">
@@ -470,6 +471,44 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
                 <th style="min-width:70px">操作</th>
               </tr></thead>
               <tbody id="assetTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- IP管理表 -->
+      <div class="page" id="page-iplist">
+        <div class="card">
+          <div class="card-header">
+            <h3>🌐 IP管理表</h3>
+            <div class="hdr-actions">
+              <select class="filter-sel" id="ipTypeFilter" onchange="renderIpList()">
+                <option value="">種別：すべて</option>
+                <option value="クライアントPC">クライアントPC</option>
+                <option value="サーバ関連">サーバ関連</option>
+                <option value="ネットワーク機器">ネットワーク機器</option>
+                <option value="その他">その他</option>
+              </select>
+              <input class="search-input" id="ipSearch" placeholder="🔍 検索…" oninput="renderIpList()" style="width:180px">
+              <button class="btn btn-secondary btn-sm" onclick="downloadIpCSV()">📥 CSV</button>
+              <button class="btn btn-primary btn-sm" onclick="openIpModal()">＋ 追加</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;overflow-x:auto">
+            <table class="tbl" id="ipTbl" style="min-width:1200px;font-size:12px">
+              <thead><tr>
+                <th style="min-width:110px">前IPアドレス</th>
+                <th style="min-width:120px">IPアドレス</th>
+                <th style="min-width:120px">端末ID（コンピュータ名）</th>
+                <th style="min-width:70px">管理者</th>
+                <th style="min-width:90px">種別</th>
+                <th style="min-width:140px">用途・目的</th>
+                <th style="min-width:90px">適用開始日</th>
+                <th style="min-width:90px">適用終了日</th>
+                <th style="min-width:120px">備考</th>
+                <th style="min-width:90px">資産番号</th>
+                <th style="min-width:60px">操作</th>
+              </tr></thead>
+              <tbody id="ipTbody"></tbody>
             </table>
           </div>
         </div>
@@ -684,6 +723,52 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
       <button class="btn btn-secondary" onclick="closeModal('assetModal')">キャンセル</button>
       <button class="btn btn-danger btn-sm" id="assetDeleteBtn" style="margin-right:auto;display:none" onclick="deleteAsset()">削除</button>
       <button class="btn btn-primary" onclick="saveAsset()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- モーダル: IP管理 -->
+<div class="modal-overlay" id="ipModal">
+  <div class="modal" style="width:600px">
+    <div class="modal-header">
+      <h3 id="ipModalTitle">IPを追加</h3>
+      <button class="modal-close" onclick="closeModal('ipModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ipId">
+      <div class="form-row">
+        <div class="fg"><label>前IPアドレス</label><input class="fc" id="ipPrev" placeholder="例：192.168.1.10"></div>
+        <div class="fg"><label>IPアドレス<span class="req">*</span></label><input class="fc" id="ipAddr" placeholder="例：192.168.1.11"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>端末ID（コンピュータ名）</label><input class="fc" id="ipTermId" placeholder="例：PC-001 / DESKTOP-XXXXX"></div>
+        <div class="fg"><label>管理者</label>
+          <select class="fc" id="ipManager"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>種別</label>
+          <select class="fc" id="ipType">
+            <option value="">選択してください</option>
+            <option>クライアントPC</option>
+            <option>サーバ関連</option>
+            <option>ネットワーク機器</option>
+            <option>その他</option>
+          </select>
+        </div>
+        <div class="fg"><label>資産番号</label><input class="fc" id="ipAssetNo" placeholder="例：A-001"></div>
+      </div>
+      <div class="fg"><label>用途・目的</label><input class="fc" id="ipPurpose" placeholder="例：開発用PC、ファイルサーバ"></div>
+      <div class="form-row">
+        <div class="fg"><label>適用開始日</label><input class="fc" id="ipStartDate" type="date"></div>
+        <div class="fg"><label>適用終了日</label><input class="fc" id="ipEndDate" type="date"></div>
+      </div>
+      <div class="fg"><label>備考</label><textarea class="fc" id="ipNote" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('ipModal')">キャンセル</button>
+      <button class="btn btn-danger btn-sm" id="ipDeleteBtn" style="margin-right:auto;display:none" onclick="deleteIp()">削除</button>
+      <button class="btn btn-primary" onclick="saveIp()">保存</button>
     </div>
   </div>
 </div>
@@ -946,6 +1031,7 @@ const PAGE_META = {
   employees: ['社員マスタ','社員情報の登録・編集・削除'],
   access:    ['入退室記録管理','入室・退室の記録'],
   assets:    ['社内資産管理','機器台帳・SPEC管理'],
+  iplist:    ['IP管理表','IPアドレス割当管理'],
   summary:   ['出社・テレワーク集計','月別・個人別出社率'],
   logs:      ['操作ログ','操作履歴'],
 };
@@ -974,6 +1060,7 @@ function navigate(page) {
   if (page==='access')    initAccessPage();
   if (page==='summary')   initSummaryPage();
   if (page==='assets')    initAssetsPage();
+  if (page==='iplist')    initIpPage();
 }
 
 // ════ ダッシュボード ════
@@ -1494,6 +1581,169 @@ function downloadAccessCSV() {
   a.href = url;
   a.download = `入退室記録_${ym || '全期間'}.csv`;
   a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ════ IP管理表 ════
+let ipRecords = [];
+
+async function initIpPage() {
+  const sel = document.getElementById('ipManager');
+  sel.innerHTML = '<option value="">未割当</option>' +
+    activeEmps().map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+  ipRecords = await ghRead('ip_list.json') || [];
+  renderIpList();
+}
+
+function renderIpList() {
+  const q     = (document.getElementById('ipSearch').value || '').toLowerCase();
+  const typeF = document.getElementById('ipTypeFilter').value;
+  const TYPE_COLOR = {'クライアントPC':'badge-blue','サーバ関連':'badge-navy','ネットワーク機器':'badge-green','その他':'badge-gray'};
+
+  let list = ipRecords.filter(r => {
+    if (typeF && r.type !== typeF) return false;
+    if (q) {
+      const t = [r.prev_ip, r.ip, r.term_id, r.purpose, r.note, r.asset_no].join(' ').toLowerCase();
+      if (!t.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b) => {
+    // IPアドレス順でソート
+    const toNum = ip => (ip||'').split('.').map(n=>String(n).padStart(3,'0')).join('');
+    return toNum(a.ip).localeCompare(toNum(b.ip));
+  });
+
+  const today = new Date().toISOString().slice(0,10);
+  const tbody = document.getElementById('ipTbody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="11" class="empty">IPレコードが登録されていません</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(r => {
+    const expired = r.end_date && r.end_date < today;
+    const rowStyle = expired ? 'opacity:.6' : '';
+    return `<tr style="${rowStyle}">
+      <td style="font-size:11px;color:var(--gray)">${r.prev_ip||'－'}</td>
+      <td style="font-weight:700;font-family:monospace;font-size:13px;color:var(--navy)">${r.ip||'－'}</td>
+      <td style="font-size:11px">${r.term_id||'－'}</td>
+      <td>${r.manager_id ? empName(r.manager_id) : '－'}</td>
+      <td><span class="badge ${TYPE_COLOR[r.type]||'badge-gray'}">${r.type||'－'}</span></td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.purpose||''}">${r.purpose||'－'}</td>
+      <td style="font-size:11px;white-space:nowrap">${r.start_date||'－'}</td>
+      <td style="font-size:11px;white-space:nowrap;${expired?'color:var(--red);font-weight:700':''}">${r.end_date||'－'}</td>
+      <td style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.note||''}">${r.note||'－'}</td>
+      <td style="font-size:11px">${r.asset_no||'－'}</td>
+      <td><button class="btn btn-secondary btn-sm" onclick="openIpModal('${r.id}')">編集</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function openIpModal(id) {
+  const sel = document.getElementById('ipManager');
+  sel.innerHTML = '<option value="">未割当</option>' +
+    activeEmps().map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+
+  if (id) {
+    const r = ipRecords.find(r => r.id === id);
+    if (!r) return;
+    document.getElementById('ipModalTitle').textContent = 'IPを編集';
+    document.getElementById('ipId').value        = r.id;
+    document.getElementById('ipPrev').value      = r.prev_ip    || '';
+    document.getElementById('ipAddr').value      = r.ip         || '';
+    document.getElementById('ipTermId').value    = r.term_id    || '';
+    document.getElementById('ipManager').value   = r.manager_id || '';
+    document.getElementById('ipType').value      = r.type       || '';
+    document.getElementById('ipAssetNo').value   = r.asset_no   || '';
+    document.getElementById('ipPurpose').value   = r.purpose    || '';
+    document.getElementById('ipStartDate').value = r.start_date || '';
+    document.getElementById('ipEndDate').value   = r.end_date   || '';
+    document.getElementById('ipNote').value      = r.note       || '';
+    document.getElementById('ipDeleteBtn').style.display = '';
+  } else {
+    document.getElementById('ipModalTitle').textContent = 'IPを追加';
+    ['ipId','ipPrev','ipAddr','ipTermId','ipAssetNo','ipPurpose','ipStartDate','ipEndDate','ipNote'].forEach(f=>{
+      document.getElementById(f).value='';
+    });
+    document.getElementById('ipManager').value = '';
+    document.getElementById('ipType').value = '';
+    document.getElementById('ipDeleteBtn').style.display = 'none';
+  }
+  openModal('ipModal');
+}
+
+async function saveIp() {
+  const id  = document.getElementById('ipId').value;
+  const ip  = document.getElementById('ipAddr').value.trim();
+  if (!ip) { toast('IPアドレスを入力してください', true); return; }
+  const n   = now();
+  const data = {
+    id:         id || uuid(),
+    prev_ip:    document.getElementById('ipPrev').value.trim(),
+    ip,
+    term_id:    document.getElementById('ipTermId').value.trim(),
+    manager_id: document.getElementById('ipManager').value || null,
+    type:       document.getElementById('ipType').value || null,
+    asset_no:   document.getElementById('ipAssetNo').value.trim(),
+    purpose:    document.getElementById('ipPurpose').value.trim(),
+    start_date: document.getElementById('ipStartDate').value || null,
+    end_date:   document.getElementById('ipEndDate').value || null,
+    note:       document.getElementById('ipNote').value.trim(),
+    created_at: id ? (ipRecords.find(r=>r.id===id)||{}).created_at || n : n,
+    updated_at: n
+  };
+  if (id) { const idx=ipRecords.findIndex(r=>r.id===id); if(idx!==-1) ipRecords[idx]=data; else ipRecords.push(data); }
+  else ipRecords.push(data);
+
+  try {
+    await ghWrite('ip_list.json', ipRecords);
+    closeModal('ipModal');
+    renderIpList();
+    await addLog(me.id, me.name, id?'EDIT_IP':'ADD_IP', data.ip);
+    toast('✅ 保存しました');
+  } catch(e) { toast('保存エラー: ' + e.message, true); }
+}
+
+async function deleteIp() {
+  const id = document.getElementById('ipId').value;
+  const r  = ipRecords.find(r=>r.id===id);
+  if (!confirm(`「${r?.ip||id}」を削除しますか？`)) return;
+  ipRecords = ipRecords.filter(r=>r.id!==id);
+  try {
+    await ghWrite('ip_list.json', ipRecords);
+    closeModal('ipModal');
+    renderIpList();
+    await addLog(me.id, me.name, 'DELETE_IP', r?.ip||'');
+    toast('🗑️ 削除しました');
+  } catch(e) { toast('削除エラー', true); }
+}
+
+function downloadIpCSV() {
+  const typeF = document.getElementById('ipTypeFilter').value;
+  const q     = (document.getElementById('ipSearch').value || '').toLowerCase();
+  let list = ipRecords.filter(r => {
+    if (typeF && r.type !== typeF) return false;
+    if (q) {
+      const t = [r.prev_ip,r.ip,r.term_id,r.purpose,r.note,r.asset_no].join(' ').toLowerCase();
+      if (!t.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b)=>{
+    const toNum = ip=>(ip||'').split('.').map(n=>String(n).padStart(3,'0')).join('');
+    return toNum(a.ip).localeCompare(toNum(b.ip));
+  });
+
+  const header = ['前IPアドレス','IPアドレス','端末ID（コンピュータ名）','管理者','種別',
+    '用途・目的','適用開始日','適用終了日','備考','資産番号'];
+  const rows = list.map(r => [
+    r.prev_ip||'', r.ip||'', r.term_id||'',
+    r.manager_id ? empName(r.manager_id) : '',
+    r.type||'', r.purpose||'', r.start_date||'', r.end_date||'', r.note||'', r.asset_no||''
+  ]);
+  const csv = [header,...rows].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`IP管理表_${new Date().toISOString().slice(0,10)}.csv`; a.click();
   URL.revokeObjectURL(url);
 }
 
