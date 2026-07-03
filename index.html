@@ -1263,11 +1263,23 @@ async function initApp() {
 }
 let projects = [];
 async function loadAll() {
-  [employees, tasks, projects] = await Promise.all([
-    ghRead('employees.json'), ghRead('tasks.json'), ghRead('projects.json')
-  ]);
-  employees = employees || []; tasks = tasks || []; projects = projects || [];
-  attendance = await ghRead('attendance.json') || {};
+  try {
+    const results = await Promise.all([
+      ghRead('employees.json').catch(()=>null),
+      ghRead('tasks.json').catch(()=>null),
+      ghRead('projects.json').catch(()=>null)
+    ]);
+    employees  = results[0] || [];
+    tasks      = results[1] || [];
+    projects   = results[2] || [];
+    attendance = await ghRead('attendance.json').catch(()=>({})) || {};
+  } catch(e) {
+    console.warn('loadAll error:', e);
+    employees = employees || [];
+    tasks     = tasks     || [];
+    projects  = projects  || [];
+    attendance= attendance|| {};
+  }
   updateBadge();
 }
 function updateBadge() {
@@ -2817,7 +2829,14 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('cl
       const s=JSON.parse(sess);
       employees=await ghRead('employees.json')||[];
       const emp=employees.find(e=>e.id===s.empId);
-      if(emp&&emp.status!=='退職'){me=emp;await initApp();return;}
+      if(emp&&emp.status!=='退職'){
+        me=emp;
+        try { await initApp(); return; }
+        catch(e2){
+          console.warn('initApp error:', e2);
+          me=null;
+        }
+      }
     }catch(e){ console.warn('session restore error:', e); }
     localStorage.removeItem('hiroshima_session');
   }
