@@ -1029,9 +1029,15 @@ const GH_BRANCH = 'data';
 // ════════════════════════════════════
 const shas = {};
 async function ghRead(file) {
-  const r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/data/${file}?ref=${GH_BRANCH}&t=${Date.now()}`, {
-    headers: { 'Authorization': `token ${getToken()}`, 'Accept': 'application/vnd.github.v3+json' }
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000);
+  let r;
+  try {
+    r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/data/${file}?ref=${GH_BRANCH}&t=${Date.now()}`, {
+      headers: { 'Authorization': `token ${getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
+      signal: controller.signal
+    });
+  } finally { clearTimeout(timer); }
   const d = await r.json();
   if (d.message) return null;
   shas[file] = d.sha;
@@ -2832,15 +2838,14 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('cl
       if(emp&&emp.status!=='退職'){
         me=emp;
         try { await initApp(); return; }
-        catch(e2){
-          console.warn('initApp error:', e2);
-          me=null;
-        }
+        catch(e2){ console.warn('initApp error:', e2); me=null; }
       }
     }catch(e){ console.warn('session restore error:', e); }
     localStorage.removeItem('hiroshima_session');
   }
-  // セッションなし or 復元失敗 → ログイン画面表示
+  // セッションなし or 復元失敗 → 必ずログイン画面表示
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('app').style.display='none';
   switchStep('step1');
   setTimeout(()=>{ const el=document.getElementById('loginEmpId'); if(el) el.focus(); },50);
 })();
