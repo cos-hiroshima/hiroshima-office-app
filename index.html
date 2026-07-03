@@ -295,6 +295,7 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
       <div class="nav-item" data-page="access" onclick="navigate('access')"><span>🚪</span>入退室記録管理</div>
       <div class="nav-item" data-page="summary" onclick="navigate('summary')"><span>📈</span>出社・テレワーク集計</div>
       <div class="nav-item" data-page="employees" onclick="navigate('employees')"><span>👥</span>社員マスタ</div>
+      <div class="nav-item" data-page="assets" onclick="navigate('assets')"><span>🖥️</span>社内資産管理</div>
       <div class="nav-item admin-only" data-page="logs" onclick="navigate('logs')" style="display:none"><span>📜</span>操作ログ</div>
     </div>
     <div class="sidebar-user">
@@ -427,6 +428,49 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
               <button class="btn btn-primary btn-sm" onclick="calcSummary()">📊 集計する</button>
             </div>
             <div id="summaryResult"></div>
+          </div>
+        </div>
+      </div>
+      <!-- 社内資産管理 -->
+      <div class="page" id="page-assets">
+        <div class="card">
+          <div class="card-header">
+            <h3>🖥️ 社内資産管理</h3>
+            <div class="hdr-actions">
+              <select class="filter-sel" id="assetTypeFilter" onchange="renderAssets()">
+                <option value="">種別：すべて</option>
+                <option value="クライアントPC">クライアントPC</option>
+                <option value="サーバ関連">サーバ関連</option>
+                <option value="その他機器">その他機器</option>
+              </select>
+              <input class="search-input" id="assetSearch" placeholder="🔍 検索…" oninput="renderAssets()" style="width:180px">
+              <button class="btn btn-secondary btn-sm" onclick="downloadAssetsCSV()">📥 CSV</button>
+              <button class="btn btn-primary btn-sm" onclick="openAssetModal()">＋ 追加</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;overflow-x:auto">
+            <table class="tbl" id="assetTbl" style="min-width:1400px;font-size:12px">
+              <thead><tr>
+                <th style="min-width:90px">資産番号</th>
+                <th style="min-width:90px">端末ID</th>
+                <th style="min-width:80px">場所</th>
+                <th style="min-width:70px">管理者</th>
+                <th style="min-width:80px">購入年月</th>
+                <th style="min-width:90px">種別</th>
+                <th style="min-width:80px">メーカー</th>
+                <th style="min-width:120px">機種/型番</th>
+                <th style="min-width:100px">製造番号</th>
+                <th style="min-width:80px">CPU/Hz</th>
+                <th style="min-width:100px">メモリ(MB)</th>
+                <th style="min-width:80px">HDD(GB)</th>
+                <th style="min-width:80px">OS</th>
+                <th style="min-width:80px">ETC</th>
+                <th style="min-width:120px">備考</th>
+                <th style="min-width:80px">リース終了</th>
+                <th style="min-width:70px">操作</th>
+              </tr></thead>
+              <tbody id="assetTbody"></tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -580,6 +624,66 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
       <button class="btn btn-secondary" onclick="closeModal('accessModal')">キャンセル</button>
       <button class="btn btn-danger btn-sm" id="accessDeleteBtn" style="margin-right:auto;display:none" onclick="deleteAccessLog()">削除</button>
       <button class="btn btn-primary" onclick="saveAccessLog()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- モーダル: 社内資産 -->
+<div class="modal-overlay" id="assetModal">
+  <div class="modal" style="width:680px">
+    <div class="modal-header">
+      <h3 id="assetModalTitle">資産を追加</h3>
+      <button class="modal-close" onclick="closeModal('assetModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="assetId">
+      <div class="form-row">
+        <div class="fg"><label>資産番号</label><input class="fc" id="assetNo" placeholder="例：A-001"></div>
+        <div class="fg"><label>端末ID</label><input class="fc" id="assetTermId" placeholder="例：PC-001"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>種別<span class="req">*</span></label>
+          <select class="fc" id="assetType">
+            <option value="">選択してください</option>
+            <option>クライアントPC</option>
+            <option>サーバ関連</option>
+            <option>その他機器</option>
+          </select>
+        </div>
+        <div class="fg"><label>メーカー</label><input class="fc" id="assetMaker" placeholder="例：Dell、HP、Lenovo"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>機種/型番</label><input class="fc" id="assetModel" placeholder="例：OptiPlex 7090"></div>
+        <div class="fg"><label>製造番号</label><input class="fc" id="assetSerial" placeholder="シリアル番号"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>場所</label><input class="fc" id="assetLocation" placeholder="例：広島オフィス 1F"></div>
+        <div class="fg"><label>管理者</label>
+          <select class="fc" id="assetManager"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>購入年月</label><input class="fc" id="assetBuyDate" type="month"></div>
+        <div class="fg"><label>リース終了年月</label><input class="fc" id="assetLeaseEnd" type="month"></div>
+      </div>
+      <div style="background:var(--sky2);border:1px solid var(--sky);border-radius:6px;padding:10px 12px;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px">SPEC概要</div>
+        <div class="form-row">
+          <div class="fg"><label>CPU/Hz</label><input class="fc" id="assetCpu" placeholder="例：Core i7 / 3.0GHz"></div>
+          <div class="fg"><label>メモリ内訳(MB)</label><input class="fc" id="assetMem" placeholder="例：16384"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>HDD容量(GB)</label><input class="fc" id="assetHdd" placeholder="例：512"></div>
+          <div class="fg"><label>OS</label><input class="fc" id="assetOs" placeholder="例：Windows 11 Pro"></div>
+        </div>
+        <div class="fg"><label>ETC</label><input class="fc" id="assetEtc" placeholder="例：Office 2021、GPU搭載"></div>
+      </div>
+      <div class="fg"><label>備考</label><textarea class="fc" id="assetNote" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('assetModal')">キャンセル</button>
+      <button class="btn btn-danger btn-sm" id="assetDeleteBtn" style="margin-right:auto;display:none" onclick="deleteAsset()">削除</button>
+      <button class="btn btn-primary" onclick="saveAsset()">保存</button>
     </div>
   </div>
 </div>
@@ -841,6 +945,7 @@ const PAGE_META = {
   tasks:     ['庶務業務管理','担当割当・タスク一覧'],
   employees: ['社員マスタ','社員情報の登録・編集・削除'],
   access:    ['入退室記録管理','入室・退室の記録'],
+  assets:    ['社内資産管理','機器台帳・SPEC管理'],
   summary:   ['出社・テレワーク集計','月別・個人別出社率'],
   logs:      ['操作ログ','操作履歴'],
 };
@@ -868,6 +973,7 @@ function navigate(page) {
   if (page==='logs')      loadLogs();
   if (page==='access')    initAccessPage();
   if (page==='summary')   initSummaryPage();
+  if (page==='assets')    initAssetsPage();
 }
 
 // ════ ダッシュボード ════
@@ -1388,6 +1494,177 @@ function downloadAccessCSV() {
   a.href = url;
   a.download = `入退室記録_${ym || '全期間'}.csv`;
   a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ════ 社内資産管理 ════
+let assets = [];
+
+async function initAssetsPage() {
+  // 管理者ドロップダウン
+  const sel = document.getElementById('assetManager');
+  sel.innerHTML = '<option value="">未割当</option>' +
+    activeEmps().map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+  assets = await ghRead('assets.json') || [];
+  renderAssets();
+}
+
+function renderAssets() {
+  const q    = (document.getElementById('assetSearch').value || '').toLowerCase();
+  const typeF = document.getElementById('assetTypeFilter').value;
+  const TYPE_COLOR = {'クライアントPC':'badge-blue','サーバ関連':'badge-navy','その他機器':'badge-gray'};
+
+  let list = assets.filter(a => {
+    if (typeF && a.type !== typeF) return false;
+    if (q) {
+      const target = [a.asset_no, a.term_id, a.maker, a.model, a.serial, a.location, a.os, a.note].join(' ').toLowerCase();
+      if (!target.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b) => (a.asset_no||'').localeCompare(b.asset_no||'', 'ja'));
+
+  const tbody = document.getElementById('assetTbody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="17" class="empty">資産が登録されていません</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(a => `<tr>
+    <td style="font-weight:600;white-space:nowrap">${a.asset_no||'－'}</td>
+    <td style="white-space:nowrap">${a.term_id||'－'}</td>
+    <td>${a.location||'－'}</td>
+    <td>${a.manager_id ? empName(a.manager_id) : '－'}</td>
+    <td style="white-space:nowrap">${a.buy_date||'－'}</td>
+    <td><span class="badge ${TYPE_COLOR[a.type]||'badge-gray'}">${a.type||'－'}</span></td>
+    <td>${a.maker||'－'}</td>
+    <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.model||''}">${a.model||'－'}</td>
+    <td style="font-size:11px;color:var(--gray)">${a.serial||'－'}</td>
+    <td style="font-size:11px">${a.cpu||'－'}</td>
+    <td style="font-size:11px">${a.memory||'－'}</td>
+    <td style="font-size:11px">${a.hdd||'－'}</td>
+    <td style="font-size:11px">${a.os||'－'}</td>
+    <td style="font-size:11px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.etc||'－'}</td>
+    <td style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.note||''}">${a.note||'－'}</td>
+    <td style="white-space:nowrap;${a.lease_end&&a.lease_end<new Date().toISOString().slice(0,7)?'color:var(--red);font-weight:700':''}">${a.lease_end||'－'}</td>
+    <td><button class="btn btn-secondary btn-sm" onclick="openAssetModal('${a.id}')">編集</button></td>
+  </tr>`).join('');
+}
+
+function openAssetModal(id) {
+  // 管理者ドロップダウン更新
+  const sel = document.getElementById('assetManager');
+  sel.innerHTML = '<option value="">未割当</option>' +
+    activeEmps().map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+
+  const fields = ['assetId','assetNo','assetTermId','assetType','assetMaker','assetModel',
+    'assetSerial','assetLocation','assetManager','assetBuyDate','assetLeaseEnd',
+    'assetCpu','assetMem','assetHdd','assetOs','assetEtc','assetNote'];
+
+  if (id) {
+    const a = assets.find(a => a.id === id);
+    if (!a) return;
+    document.getElementById('assetModalTitle').textContent = '資産を編集';
+    document.getElementById('assetId').value       = a.id;
+    document.getElementById('assetNo').value       = a.asset_no   || '';
+    document.getElementById('assetTermId').value   = a.term_id    || '';
+    document.getElementById('assetType').value     = a.type       || '';
+    document.getElementById('assetMaker').value    = a.maker      || '';
+    document.getElementById('assetModel').value    = a.model      || '';
+    document.getElementById('assetSerial').value   = a.serial     || '';
+    document.getElementById('assetLocation').value = a.location   || '';
+    document.getElementById('assetManager').value  = a.manager_id || '';
+    document.getElementById('assetBuyDate').value  = a.buy_date   || '';
+    document.getElementById('assetLeaseEnd').value = a.lease_end  || '';
+    document.getElementById('assetCpu').value      = a.cpu        || '';
+    document.getElementById('assetMem').value      = a.memory     || '';
+    document.getElementById('assetHdd').value      = a.hdd        || '';
+    document.getElementById('assetOs').value       = a.os         || '';
+    document.getElementById('assetEtc').value      = a.etc        || '';
+    document.getElementById('assetNote').value     = a.note       || '';
+    document.getElementById('assetDeleteBtn').style.display = '';
+  } else {
+    document.getElementById('assetModalTitle').textContent = '資産を追加';
+    fields.forEach(f => { const el = document.getElementById(f); if(el) el.value = ''; });
+    document.getElementById('assetDeleteBtn').style.display = 'none';
+  }
+  openModal('assetModal');
+}
+
+async function saveAsset() {
+  const id = document.getElementById('assetId').value;
+  if (!document.getElementById('assetType').value) { toast('種別を選択してください', true); return; }
+  const n = now();
+  const data = {
+    id:         id || uuid(),
+    asset_no:   document.getElementById('assetNo').value.trim(),
+    term_id:    document.getElementById('assetTermId').value.trim(),
+    type:       document.getElementById('assetType').value,
+    maker:      document.getElementById('assetMaker').value.trim(),
+    model:      document.getElementById('assetModel').value.trim(),
+    serial:     document.getElementById('assetSerial').value.trim(),
+    location:   document.getElementById('assetLocation').value.trim(),
+    manager_id: document.getElementById('assetManager').value || null,
+    buy_date:   document.getElementById('assetBuyDate').value || null,
+    lease_end:  document.getElementById('assetLeaseEnd').value || null,
+    cpu:        document.getElementById('assetCpu').value.trim(),
+    memory:     document.getElementById('assetMem').value.trim(),
+    hdd:        document.getElementById('assetHdd').value.trim(),
+    os:         document.getElementById('assetOs').value.trim(),
+    etc:        document.getElementById('assetEtc').value.trim(),
+    note:       document.getElementById('assetNote').value.trim(),
+    created_at: id ? (assets.find(a=>a.id===id)||{}).created_at || n : n,
+    updated_at: n
+  };
+  if (id) { const idx = assets.findIndex(a=>a.id===id); if(idx!==-1) assets[idx]=data; else assets.push(data); }
+  else assets.push(data);
+
+  try {
+    await ghWrite('assets.json', assets);
+    closeModal('assetModal');
+    renderAssets();
+    await addLog(me.id, me.name, id?'EDIT_ASSET':'ADD_ASSET', `${data.asset_no||data.term_id||data.model}`);
+    toast('✅ 保存しました');
+  } catch(e) { toast('保存エラー: ' + e.message, true); }
+}
+
+async function deleteAsset() {
+  const id = document.getElementById('assetId').value;
+  const a = assets.find(a=>a.id===id);
+  if (!confirm(`「${a?.asset_no||a?.model||id}」を削除しますか？`)) return;
+  assets = assets.filter(a=>a.id!==id);
+  try {
+    await ghWrite('assets.json', assets);
+    closeModal('assetModal');
+    renderAssets();
+    await addLog(me.id, me.name, 'DELETE_ASSET', a?.asset_no||a?.model||'');
+    toast('🗑️ 削除しました');
+  } catch(e) { toast('削除エラー', true); }
+}
+
+function downloadAssetsCSV() {
+  const typeF = document.getElementById('assetTypeFilter').value;
+  const q     = (document.getElementById('assetSearch').value || '').toLowerCase();
+  let list = assets.filter(a => {
+    if (typeF && a.type !== typeF) return false;
+    if (q) {
+      const t = [a.asset_no,a.term_id,a.maker,a.model,a.serial,a.location,a.os,a.note].join(' ').toLowerCase();
+      if (!t.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b)=>(a.asset_no||'').localeCompare(b.asset_no||'','ja'));
+
+  const header = ['資産番号','端末ID','場所','管理者','購入年月','種別','メーカー',
+    '機種/型番','製造番号','CPU/Hz','メモリ内訳(MB)','HDD容量(GB)','OS','ETC','備考','リース終了年月'];
+  const rows = list.map(a => [
+    a.asset_no||'', a.term_id||'', a.location||'',
+    a.manager_id ? empName(a.manager_id) : '',
+    a.buy_date||'', a.type||'', a.maker||'', a.model||'', a.serial||'',
+    a.cpu||'', a.memory||'', a.hdd||'', a.os||'', a.etc||'', a.note||'', a.lease_end||''
+  ]);
+  const csv = [header,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a2 = document.createElement('a');
+  a2.href=url; a2.download=`社内資産台帳_${new Date().toISOString().slice(0,10)}.csv`; a2.click();
   URL.revokeObjectURL(url);
 }
 
