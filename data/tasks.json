@@ -22,12 +22,12 @@
     "priority": "中",
     "frequency": "月次",
     "rotation_type": "monthly",
-    "assignee_id": "__office__",
+    "assignee_id": "__all__",
     "sub_assignee_id": "__all__",
     "status": "担当未定",
     "note": "入力者は前日記録漏れが無いか？確認後に入力する事。\n※漏れがあった場合にはSLACK「広島オフィス」にて確認。",
-    "created_at": "2026-07-03 02:52:34",
-    "updated_at": "2026-07-03 02:52:34"
+    "created_at": "2026-07-03 02:52:46",
+    "updated_at": "2026-07-03 02:52:46"
   },
   {
     "id": "task003",
