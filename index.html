@@ -2823,12 +2823,10 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('cl
 
 // ════ 起動時セッション復元 ════
 (async()=>{
-  // 起動時：必ずloginScreen表示・app非表示を確定
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-
   // アクセスキー（GH_TOKEN）未設定なら初期設定画面へ
   if(!localStorage.getItem('hiroshima_gh_token')){
+    document.getElementById('loginScreen').style.display='flex';
+    document.getElementById('app').style.display='none';
     switchStep('step0');
     setTimeout(()=>document.getElementById('accessKey').focus(),50);
     return;
@@ -2847,7 +2845,7 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('cl
     }catch(e){ console.warn('session restore error:', e); }
     localStorage.removeItem('hiroshima_session');
   }
-  // セッションなし or 復元失敗 → 必ずログイン画面表示
+  // セッションなし or 復元失敗 → ログイン画面表示
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('app').style.display='none';
   switchStep('step1');
