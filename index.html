@@ -1371,11 +1371,10 @@ function renderDashboard() {
 
   // 出社率計算（月単位締め：有休・未入力は分母から除外しない）
   // 当月表示中 → 今日まで、過去月 → 月全体
-  const isCurrentMonth = (calYear===today.getFullYear()&&calMonth===today.getMonth()+1);
-  const targetWdays = isCurrentMonth ? pastWdays : wdays;
-  function officeRate(empId){ return calcOfficeRate(empId, targetWdays, att); }
+  // 出社率は常に月間稼働日数（全平日）を分母にする
+  function officeRate(empId){ return calcOfficeRate(empId, wdays, att); }
 
-  let calHtml=`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="cal-table"><tr><th class="col-name">氏名</th><th class="col-date" style="min-width:64px;background:var(--blue);font-size:10px;line-height:1.3">出社率<br><span style=\"font-weight:400;opacity:.8\">${isCurrentMonth?'月中':'月締め'}</span></th>`;
+  let calHtml=`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="cal-table"><tr><th class="col-name">氏名</th><th class="col-date" style="min-width:64px;background:var(--blue);font-size:11px">出社率</th>`;
   allDays.forEach(d=>{const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);const cls=hol?'col-date hol':dw===6?'col-date sat':dw===0?'col-date sun':'col-date';calHtml+=`<th class="${cls}">${d}<br>${WD_JP[dw]}</th>`;});
   calHtml+='</tr>';
 
@@ -1422,9 +1421,8 @@ function renderCalendar() {
   const wdays=allDays.filter(d=>{const dw=dow(calYear,calMonth,d);return dw!==0&&dw!==6&&!isHol(calYear,calMonth,d);});
   const pastWdays=wdays.filter(d=>d<=todayD);
 
-  const isCurrentMonth = (calYear===today.getFullYear()&&calMonth===today.getMonth()+1);
-  const targetWdays = isCurrentMonth ? pastWdays : wdays;
-  function empRate(empId){ return calcOfficeRate(empId, targetWdays, att); }
+  // 出社率は常に月間稼働日数（全平日）を分母にする
+  function empRate(empId){ return calcOfficeRate(empId, wdays, att); }
   function rateColor(r){ return rateColorFn(r); }
 
   let html=`<table class="cal-table" style="min-width:${60+60+44*days}px"><tr>`;
