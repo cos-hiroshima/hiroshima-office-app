@@ -1040,6 +1040,28 @@ function isAdmin() { return me?.role === 'admin'; }
 function now() { return new Date().toISOString().replace('T',' ').slice(0,19); }
 function uuid() { return 'id' + Date.now() + Math.random().toString(36).slice(2); }
 
+// ─── 共通出社率計算 ─────────────────────────────────────────
+// 分母＝全平日数 - 有休日数（未入力は分母に含める）
+// 分子＝出社日数 + 客先日数
+// 返値：0〜100の整数、または null（対象平日なし）
+function calcOfficeRate(empId, targetDays, attObj) {
+  if (!targetDays || !targetDays.length) return null;
+  let office = 0, client = 0, leave = 0;
+  targetDays.forEach(d => {
+    const st = (attObj[empId] || {})[String(d)] || null;
+    if (st === '出社')      office++;
+    else if (st === '客先') client++;
+    else if (st === '有休') leave++;
+  });
+  const denom = targetDays.length - leave;
+  if (denom <= 0) return null; // 全日有休
+  return Math.round((office + client) / denom * 100);
+}
+function rateColorFn(r) {
+  return r === null ? '#aaa' : r >= 80 ? 'var(--green)' : r >= 50 ? 'var(--amber)' : 'var(--red)';
+}
+// ────────────────────────────────────────────────────────────
+
 // ════ ログイン ════
 let loginEmpId = '';
 
@@ -1286,7 +1308,7 @@ function renderDashboard() {
   });
 
   calHtml+=`<tr class="cnt-row"><td class="col-name">出社人数</td><td></td>`;
-  allDays.forEach(d=>{const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);if(dw===0||dw===6||hol){calHtml+='<td style="background:#f0f0f0;color:#ccc">－</td>';return;}const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;calHtml+=`<td class="${cnt<2?'cnt-alert':''}">${cnt}</td>`;});
+  allDays.forEach(d=>{const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);if(dw===0||dw===6||hol){calHtml+='<td style="background:#f0f0f0;color:#ccc">－</td>';return;}const cnt=active.filter(e=>(att[e.id]||{})[String(d)]==='出社').length;calHtml+=`<td class="${cnt<2?'cnt-alert':''}">${cnt}</td>`;});
   calHtml+='</tr></table></div>';
   document.getElementById('dashCalPreview').innerHTML =
     `<div style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;letter-spacing:.05em">${calYear}年 ${(window.MONTH_JP||["","1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"])[calMonth]}</div>` + calHtml;
@@ -1314,18 +1336,10 @@ function renderCalendar() {
   const wdays=allDays.filter(d=>{const dw=dow(calYear,calMonth,d);return dw!==0&&dw!==6&&!isHol(calYear,calMonth,d);});
   const pastWdays=wdays.filter(d=>d<=todayD);
 
-  // 月単位締め：当月→今日まで、過去月→月全体
   const isCurrentMonth = (calYear===today.getFullYear()&&calMonth===today.getMonth()+1);
   const targetWdays = isCurrentMonth ? pastWdays : wdays;
-  function empRate(empId){
-    if(!targetWdays.length) return null;
-    const out=targetWdays.filter(d=>{const st=(att[empId]||{})[d];return st==='出社'||st==='客先';}).length;
-    // 分母＝全平日数（未入力も含む）、有休のみ除外
-    const leave=targetWdays.filter(d=>(att[empId]||{})[d]==='有休').length;
-    const denom=targetWdays.length-leave||targetWdays.length;
-    return Math.round(out/denom*100);
-  }
-  function rateColor(r){return r===null?'#aaa':r>=80?'var(--green)':r>=50?'var(--amber)':'var(--red)';}
+  function empRate(empId){ return calcOfficeRate(empId, targetWdays, att); }
+  function rateColor(r){ return rateColorFn(r); }
 
   let html=`<table class="cal-table" style="min-width:${60+60+44*days}px"><tr>`;
   html+=`<th class="col-name" style="min-width:80px">氏名</th>`;
@@ -1360,7 +1374,7 @@ function renderCalendar() {
   for(let d=1;d<=days;d++){
     const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
     if(dw===0||dw===6||hol){html+='<td style="background:#f0f0f0;color:#ccc">－</td>';continue;}
-    const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;
+    const cnt=active.filter(e=>(att[e.id]||{})[String(d)]==='出社').length;
     html+=`<td class="${cnt<2?'cnt-alert':''}">${cnt}</td>`;
   }
   html+='</tr>';
@@ -1370,9 +1384,9 @@ function renderCalendar() {
   for(let d=1;d<=days;d++){
     const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
     if(dw===0||dw===6||hol||d>todayD){html+=`<td style="background:#f0f0f0;color:#ccc;font-size:11px">－</td>`;continue;}
-    const cnt=active.filter(e=>(att[e.id]||{})[d]==='出社').length;
-    const denom=active.filter(e=>{const st=(att[e.id]||{})[d];return !st||st==='出社'||st==='在宅'||st==='客先';}).length||active.length;
-    const r=Math.round(cnt/denom*100);
+    const cnt=active.filter(e=>(att[e.id]||{})[String(d)]==='出社').length;
+    const nonLeave=active.filter(e=>(att[e.id]||{})[String(d)]!=='有休').length||active.length;
+    const r=Math.round(cnt/nonLeave*100);
     html+=`<td style="font-size:11px;font-weight:700;color:${r>=50?'var(--blue)':'var(--red)'};background:#e8f4fd">${r}%</td>`;
   }
   html+='</tr></table>';
@@ -2278,23 +2292,22 @@ function getWorkdays(ym) {
 
 // 1人1月の集計
 function calcEmpMonth(empId, ym, attData) {
-  const att = (attData[ym] || {})[empId] || {};
+  const attEmp = (attData[ym] || {})[empId] || {};
   const wdays = getWorkdays(ym);
   if (!wdays.length) return null;
   let office = 0, remote = 0, client = 0, leave = 0, undef = 0;
   wdays.forEach(d => {
-    const st = att[d] || null;
+    const st = attEmp[String(d)] || null;
     if (st === '出社')      office++;
     else if (st === '在宅') remote++;
     else if (st === '客先') client++;
     else if (st === '有休') leave++;
     else                   undef++;
   });
-  const working = office + remote + client; // 入力済み実働日（参考値）
+  const working = office + remote + client;
   const total   = wdays.length;
-  // 分母＝全平日数 - 有休（未入力も分母に含める）
-  const denom = total - leave || total;
-  const officeRate = Math.round((office + client) / denom * 100);
+  const denom   = total - leave;
+  const officeRate = denom > 0 ? Math.round((office + client) / denom * 100) : null;
   return { office, remote, client, leave, undef, total, working, officeRate };
 }
 
