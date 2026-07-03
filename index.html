@@ -306,6 +306,7 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
       <div class="nav-item" data-page="assets" onclick="navigate('assets')"><span>🖥️</span>社内資産管理</div>
       <div class="nav-item" data-page="iplist" onclick="navigate('iplist')"><span>🌐</span>IP管理表</div>
       <div class="nav-item" data-page="keys" onclick="navigate('keys')"><span>🔑</span>鍵管理</div>
+      <div class="nav-item" data-page="orders" onclick="navigate('orders')"><span>📦</span>備品・消耗品発注</div>
       <div class="nav-item admin-only" data-page="logs" onclick="navigate('logs')" style="display:none"><span>📜</span>操作ログ</div>
     </div>
     <div class="sidebar-user">
@@ -582,6 +583,37 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
                 <th style="min-width:70px">操作</th>
               </tr></thead>
               <tbody id="projectTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- 備品・消耗品発注 -->
+      <div class="page" id="page-orders">
+        <div class="card">
+          <div class="card-header">
+            <h3>📦 備品・消耗品発注表</h3>
+            <div class="hdr-actions">
+              <input type="month" class="fc" id="orderMonthFilter" style="width:150px" onchange="renderOrders()">
+              <input class="search-input" id="orderSearch" placeholder="🔍 検索…" oninput="renderOrders()" style="width:160px">
+              <button class="btn btn-secondary btn-sm" onclick="downloadOrdersCSV()">📥 CSV</button>
+              <button class="btn btn-primary btn-sm" onclick="openOrderModal()">＋ 追加</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;overflow-x:auto">
+            <table class="tbl" id="orderTbl" style="min-width:1100px;font-size:12px">
+              <thead><tr>
+                <th style="min-width:90px">発注日付</th>
+                <th style="min-width:70px">発注者</th>
+                <th style="min-width:120px">品名</th>
+                <th style="min-width:100px">発注先</th>
+                <th style="min-width:90px">品目</th>
+                <th style="min-width:60px">数量</th>
+                <th style="min-width:90px">合計金額</th>
+                <th style="min-width:80px">稟議</th>
+                <th style="min-width:140px">備考</th>
+                <th style="min-width:60px">操作</th>
+              </tr></thead>
+              <tbody id="orderTbody"></tbody>
             </table>
           </div>
         </div>
@@ -920,6 +952,68 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
   </div>
 </div>
 
+<!-- モーダル: 備品発注 -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal" style="width:580px">
+    <div class="modal-header">
+      <h3 id="orderModalTitle">発注を追加</h3>
+      <button class="modal-close" onclick="closeModal('orderModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="orderId">
+      <div class="form-row">
+        <div class="fg"><label>発注日付<span class="req">*</span></label>
+          <input class="fc" id="orderDate" type="date">
+        </div>
+        <div class="fg"><label>発注者</label>
+          <select class="fc" id="orderPerson"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>品名<span class="req">*</span></label>
+          <input class="fc" id="orderItem" placeholder="例：コピー用紙 A4">
+        </div>
+        <div class="fg"><label>発注先</label>
+          <input class="fc" id="orderSupplier" placeholder="例：アスクル、Amazon">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>品目</label>
+          <input class="fc" id="orderCategory" list="orderCategoryList" placeholder="例：消耗品、備品">
+          <datalist id="orderCategoryList">
+            <option>消耗品</option><option>備品</option><option>OA機器</option>
+            <option>清掃用品</option><option>衛生用品</option><option>文具</option><option>その他</option>
+          </datalist>
+        </div>
+        <div class="fg"><label>数量</label>
+          <input class="fc" id="orderQty" type="number" min="1" placeholder="例：5">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>合計金額（円）</label>
+          <input class="fc" id="orderAmount" type="number" min="0" placeholder="例：3000">
+        </div>
+        <div class="fg"><label>稟議</label>
+          <select class="fc" id="orderApproval">
+            <option value="不要">不要</option>
+            <option value="要">要</option>
+            <option value="申請中">申請中</option>
+            <option value="承認済">承認済</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>備考</label>
+        <textarea class="fc" id="orderNote" rows="2" placeholder="用途・補足など"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('orderModal')">キャンセル</button>
+      <button class="btn btn-danger btn-sm" id="orderDeleteBtn" style="margin-right:auto;display:none" onclick="deleteOrder()">削除</button>
+      <button class="btn btn-primary" onclick="saveOrder()">保存</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -1206,6 +1300,7 @@ const PAGE_META = {
   assets:    ['社内資産管理','機器台帳・SPEC管理'],
   iplist:    ['IP管理表','IPアドレス割当管理'],
   keys:      ['鍵管理','鍵台帳・保管場所管理'],
+  orders:    ['備品・消耗品発注','発注履歴管理'],
   summary:   ['出社・テレワーク集計','月別・個人別出社率'],
   logs:      ['操作ログ','操作履歴'],
 };
@@ -1237,6 +1332,7 @@ function navigate(page) {
   if (page==='projects')  initProjectsPage();
   if (page==='iplist')    initIpPage();
   if (page==='keys')      initKeysPage();
+  if (page==='orders')    initOrdersPage();
 }
 
 // ════ ダッシュボード ════
@@ -1760,6 +1856,180 @@ function downloadAccessCSV() {
   a.href = url;
   a.download = `入退室記録_${ym || '全期間'}.csv`;
   a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ════ 備品・消耗品発注 ════
+let orderRecords = [];
+
+async function initOrdersPage() {
+  const sel = document.getElementById('orderPerson');
+  sel.innerHTML = '<option value="">未設定</option>' +
+    activeEmps().map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+  // 今月デフォルト
+  const mEl = document.getElementById('orderMonthFilter');
+  if (!mEl.value) {
+    const t = new Date();
+    mEl.value = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}`;
+  }
+  orderRecords = await ghRead('orders.json') || [];
+  renderOrders();
+}
+
+function renderOrders() {
+  const q  = (document.getElementById('orderSearch').value || '').toLowerCase();
+  const ym = document.getElementById('orderMonthFilter').value;
+
+  let list = orderRecords.filter(r => {
+    if (ym && !(r.date||'').startsWith(ym)) return false;
+    if (q) {
+      const t = [r.date, r.item, r.supplier, r.category, r.note, r.approval].join(' ').toLowerCase();
+      if (!t.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  const tbody = document.getElementById('orderTbody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="10" class="empty">発注記録がありません</td></tr>`;
+    return;
+  }
+
+  // 合計金額の集計
+  const totalAmt = list.reduce((s,r) => s + (parseInt(r.amount)||0), 0);
+
+  const APPROVAL_COLOR = {'不要':'badge-gray','要':'badge-high','申請中':'badge-mid','承認済':'badge-green'};
+  tbody.innerHTML = list.map(r => `<tr>
+    <td style="white-space:nowrap;font-weight:600">${r.date||'－'}</td>
+    <td>${r.person_id ? empName(r.person_id) : '－'}</td>
+    <td style="font-weight:600">${r.item||'－'}</td>
+    <td style="font-size:11px">${r.supplier||'－'}</td>
+    <td><span class="badge badge-gray" style="font-size:10px">${r.category||'－'}</span></td>
+    <td style="text-align:right">${r.qty!=null?r.qty+'':'－'}</td>
+    <td style="text-align:right;font-weight:600">${r.amount!=null?Number(r.amount).toLocaleString()+'円':'－'}</td>
+    <td><span class="badge ${APPROVAL_COLOR[r.approval]||'badge-gray'}">${r.approval||'－'}</span></td>
+    <td style="font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.note||''}">${r.note||'－'}</td>
+    <td><button class="btn btn-secondary btn-sm" onclick="openOrderModal('${r.id}')">編集</button></td>
+  </tr>`).join('') +
+  `<tr style="background:var(--sky2);font-weight:700">
+    <td colspan="6" style="text-align:right;font-size:12px;color:var(--navy)">合計金額</td>
+    <td style="text-align:right;font-size:13px;color:var(--navy)">${totalAmt.toLocaleString()}円</td>
+    <td colspan="3"></td>
+  </tr>`;
+}
+
+function openOrderModal(id) {
+  const sel = document.getElementById('orderPerson');
+  sel.innerHTML = '<option value="">未設定</option>' +
+    activeEmps().map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+
+  if (id) {
+    const r = orderRecords.find(r => r.id === id);
+    if (!r) return;
+    document.getElementById('orderModalTitle').textContent = '発注を編集';
+    document.getElementById('orderId').value       = r.id;
+    document.getElementById('orderDate').value     = r.date       || '';
+    document.getElementById('orderPerson').value   = r.person_id  || '';
+    document.getElementById('orderItem').value     = r.item       || '';
+    document.getElementById('orderSupplier').value = r.supplier   || '';
+    document.getElementById('orderCategory').value = r.category   || '';
+    document.getElementById('orderQty').value      = r.qty        != null ? r.qty : '';
+    document.getElementById('orderAmount').value   = r.amount     != null ? r.amount : '';
+    document.getElementById('orderApproval').value = r.approval   || '不要';
+    document.getElementById('orderNote').value     = r.note       || '';
+    document.getElementById('orderDeleteBtn').style.display = '';
+  } else {
+    document.getElementById('orderModalTitle').textContent = '発注を追加';
+    document.getElementById('orderId').value       = '';
+    document.getElementById('orderDate').value     = new Date().toISOString().slice(0,10);
+    document.getElementById('orderPerson').value   = me?.id || '';
+    document.getElementById('orderItem').value     = '';
+    document.getElementById('orderSupplier').value = '';
+    document.getElementById('orderCategory').value = '';
+    document.getElementById('orderQty').value      = '';
+    document.getElementById('orderAmount').value   = '';
+    document.getElementById('orderApproval').value = '不要';
+    document.getElementById('orderNote').value     = '';
+    document.getElementById('orderDeleteBtn').style.display = 'none';
+  }
+  openModal('orderModal');
+}
+
+async function saveOrder() {
+  const id   = document.getElementById('orderId').value;
+  const item = document.getElementById('orderItem').value.trim();
+  const date = document.getElementById('orderDate').value;
+  if (!item || !date) { toast('発注日付と品名は必須です', true); return; }
+  const n = now();
+  const data = {
+    id:         id || uuid(),
+    date,
+    person_id:  document.getElementById('orderPerson').value   || null,
+    item,
+    supplier:   document.getElementById('orderSupplier').value.trim(),
+    category:   document.getElementById('orderCategory').value.trim(),
+    qty:        document.getElementById('orderQty').value !== '' ? parseInt(document.getElementById('orderQty').value) : null,
+    amount:     document.getElementById('orderAmount').value !== '' ? parseInt(document.getElementById('orderAmount').value) : null,
+    approval:   document.getElementById('orderApproval').value || '不要',
+    note:       document.getElementById('orderNote').value.trim(),
+    created_at: id ? (orderRecords.find(r=>r.id===id)||{}).created_at || n : n,
+    updated_at: n
+  };
+  if (id) { const idx=orderRecords.findIndex(r=>r.id===id); if(idx!==-1) orderRecords[idx]=data; else orderRecords.push(data); }
+  else orderRecords.push(data);
+
+  try {
+    await ghWrite('orders.json', orderRecords);
+    closeModal('orderModal');
+    renderOrders();
+    await addLog(me.id, me.name, id?'EDIT_ORDER':'ADD_ORDER', `${date} ${item}`);
+    toast('✅ 保存しました');
+  } catch(e) { toast('保存エラー: '+e.message, true); }
+}
+
+async function deleteOrder() {
+  const id = document.getElementById('orderId').value;
+  const r  = orderRecords.find(r=>r.id===id);
+  if (!confirm(`「${r?.item||id}」を削除しますか？`)) return;
+  orderRecords = orderRecords.filter(r=>r.id!==id);
+  try {
+    await ghWrite('orders.json', orderRecords);
+    closeModal('orderModal');
+    renderOrders();
+    toast('🗑️ 削除しました');
+  } catch(e) { toast('削除エラー', true); }
+}
+
+function downloadOrdersCSV() {
+  const ym = document.getElementById('orderMonthFilter').value;
+  const q  = (document.getElementById('orderSearch').value || '').toLowerCase();
+  let list = orderRecords.filter(r => {
+    if (ym && !(r.date||'').startsWith(ym)) return false;
+    if (q) {
+      const t = [r.date,r.item,r.supplier,r.category,r.note,r.approval].join(' ').toLowerCase();
+      if (!t.includes(q)) return false;
+    }
+    return true;
+  }).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  const header = ['発注日付','発注者','品名','発注先','品目','数量','合計金額（円）','稟議','備考'];
+  const rows = list.map(r => [
+    r.date||'',
+    r.person_id ? empName(r.person_id) : '',
+    r.item||'', r.supplier||'', r.category||'',
+    r.qty!=null ? r.qty : '',
+    r.amount!=null ? r.amount : '',
+    r.approval||'', r.note||''
+  ]);
+  // 合計行
+  const totalAmt = list.reduce((s,r)=>s+(parseInt(r.amount)||0),0);
+  rows.push(['','','','','','合計',''+totalAmt,'','']);
+
+  const csv = [header,...rows].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`備品消耗品発注表_${ym||new Date().toISOString().slice(0,7)}.csv`; a.click();
   URL.revokeObjectURL(url);
 }
 
