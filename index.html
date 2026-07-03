@@ -1037,7 +1037,11 @@ async function ghRead(file) {
       headers: { 'Authorization': `token ${getToken()}`, 'Accept': 'application/vnd.github.v3+json' },
       signal: controller.signal
     });
-  } finally { clearTimeout(timer); }
+  } catch(e) {
+    clearTimeout(timer);
+    throw new Error('API接続エラー: ' + e.message);
+  }
+  clearTimeout(timer);
   const d = await r.json();
   if (d.message) return null;
   shas[file] = d.sha;
