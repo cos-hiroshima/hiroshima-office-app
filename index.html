@@ -1139,17 +1139,14 @@ function uuid() { return 'id' + Date.now() + Math.random().toString(36).slice(2)
 // 分子＝出社日数 + 客先日数
 // 返値：0〜100の整数、または null（対象平日なし）
 function calcOfficeRate(empId, targetDays, attObj) {
+  // 出社率 = 出社日数 ÷ 全平日数（他の選択肢・空白はゼロ扱い）
   if (!targetDays || !targetDays.length) return null;
-  let office = 0, client = 0, leave = 0;
+  let office = 0;
   targetDays.forEach(d => {
     const st = (attObj[empId] || {})[String(d)] || null;
-    if (st === '出社')      office++;
-    else if (st === '客先') client++;
-    else if (st === '有休') leave++;
+    if (st === '出社') office++;
   });
-  const denom = targetDays.length - leave;
-  if (denom <= 0) return null; // 全日有休
-  return Math.round((office + client) / denom * 100);
+  return Math.round(office / targetDays.length * 100);
 }
 function rateColorFn(r) {
   return r === null ? '#aaa' : r >= 80 ? 'var(--green)' : r >= 50 ? 'var(--amber)' : 'var(--red)';
@@ -1376,14 +1373,7 @@ function renderDashboard() {
   // 当月表示中 → 今日まで、過去月 → 月全体
   const isCurrentMonth = (calYear===today.getFullYear()&&calMonth===today.getMonth()+1);
   const targetWdays = isCurrentMonth ? pastWdays : wdays;
-  function officeRate(empId){
-    if(!targetWdays.length) return null;
-    const cnt=targetWdays.filter(d=>{const st=(att[empId]||{})[d];return st==='出社'||st==='客先';}).length;
-    // 分母＝全平日数（未入力も含む）、有休のみ除外
-    const leave=targetWdays.filter(d=>(att[empId]||{})[d]==='有休').length;
-    const denom=targetWdays.length-leave||targetWdays.length;
-    return Math.round(cnt/denom*100);
-  }
+  function officeRate(empId){ return calcOfficeRate(empId, targetWdays, att); }
 
   let calHtml=`<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table class="cal-table"><tr><th class="col-name">氏名</th><th class="col-date" style="min-width:64px;background:var(--blue);font-size:10px;line-height:1.3">出社率<br><span style=\"font-weight:400;opacity:.8\">${isCurrentMonth?'月中':'月締め'}</span></th>`;
   allDays.forEach(d=>{const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);const cls=hol?'col-date hol':dw===6?'col-date sat':dw===0?'col-date sun':'col-date';calHtml+=`<th class="${cls}">${d}<br>${WD_JP[dw]}</th>`;});
@@ -1481,8 +1471,7 @@ function renderCalendar() {
     const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
     if(dw===0||dw===6||hol||d>todayD){html+=`<td style="background:#f0f0f0;color:#ccc;font-size:11px">－</td>`;continue;}
     const cnt=active.filter(e=>(att[e.id]||{})[String(d)]==='出社').length;
-    const nonLeave=active.filter(e=>(att[e.id]||{})[String(d)]!=='有休').length||active.length;
-    const r=Math.round(cnt/nonLeave*100);
+    const r=Math.round(cnt/active.length*100);
     html+=`<td style="font-size:11px;font-weight:700;color:${r>=50?'var(--blue)':'var(--red)'};background:#e8f4fd">${r}%</td>`;
   }
   html+='</tr></table>';
@@ -2576,8 +2565,8 @@ function calcEmpMonth(empId, ym, attData) {
   });
   const working = office + remote + client;
   const total   = wdays.length;
-  const denom   = total - leave;
-  const officeRate = denom > 0 ? Math.round((office + client) / denom * 100) : null;
+  // 出社率 = 出社日数 ÷ 全平日数（他はゼロ扱い）
+  const officeRate = total > 0 ? Math.round(office / total * 100) : null;
   return { office, remote, client, leave, undef, total, working, officeRate };
 }
 
@@ -2620,7 +2609,7 @@ async function calcSummary() {
 
   // 各社員行
   active.forEach(e => {
-    let totalOffice=0, totalRemote=0, totalClient=0, totalLeave=0, totalWorking=0;
+    let totalOffice=0, totalRemote=0, totalClient=0, totalLeave=0, totalWorking=0, totalTotal=0;
     const monthCells = months.map(ym => {
       const r = calcEmpMonth(e.id, ym, attData);
       if (!r) return `<td>－</td><td style="font-size:11px;color:var(--gray)">－</td>`;
@@ -2629,13 +2618,14 @@ async function calcSummary() {
       totalClient  += r.client;
       totalLeave   += r.leave;
       totalWorking += r.working;
+      totalTotal  += r.total;
       const rateColor = r.officeRate === null ? '#aaa' : r.officeRate >= 80 ? 'var(--green)' : r.officeRate >= 50 ? 'var(--amber)' : 'var(--red)';
       const rateStr = r.officeRate === null ? '－' : r.officeRate + '%';
       const detail = `${r.office}/${r.remote}/${r.client}/${r.leave}`;
       return `<td style="text-align:center;font-weight:700;color:${rateColor}">${rateStr}</td>
               <td style="text-align:center;font-size:11px;color:var(--text2)">${detail}</td>`;
     });
-    const totalRate = totalWorking > 0 ? Math.round((totalOffice + totalClient) / totalWorking * 100) : null;
+    const totalRate = totalTotal > 0 ? Math.round(totalOffice / totalTotal * 100) : null;
     const totalRateColor = totalRate === null ? '#aaa' : totalRate >= 80 ? 'var(--green)' : totalRate >= 50 ? 'var(--amber)' : 'var(--red)';
     const totalRateStr = totalRate === null ? '－' : totalRate + '%';
     const totalDetail = `${totalOffice}/${totalRemote}/${totalClient}/${totalLeave}`;
@@ -2652,20 +2642,22 @@ async function calcSummary() {
   // 月別平均行
   html += `<tr style="background:#e8f4fd;font-weight:700">
     <td colspan="2" style="font-size:12px;color:var(--blue)">月平均出社率</td>`;
-  let grandOffice=0, grandRemote=0, grandClient=0, grandLeave=0, grandWorking=0;
+  let grandOffice=0, grandRemote=0, grandClient=0, grandLeave=0, grandWorking=0, grandTotal=0;
   months.forEach(ym => {
     let mo=0, mr=0, mc=0, ml=0, mw=0;
     active.forEach(e => {
       const r = calcEmpMonth(e.id, ym, attData);
       if (r) { mo+=r.office; mr+=r.remote; mc+=r.client; ml+=r.leave; mw+=r.working; }
     });
-    grandOffice+=mo; grandRemote+=mr; grandClient+=mc; grandLeave+=ml; grandWorking+=mw;
-    const avg = mw > 0 ? Math.round((mo+mc)/mw*100) : null;
+    let mt=0; active.forEach(e=>{ const r2=calcEmpMonth(e.id,ym,attData); if(r2) mt+=r2.total; });
+    grandOffice+=mo; grandRemote+=mr; grandClient+=mc; grandLeave+=ml; grandWorking+=mw; grandTotal+=mt;
+    const avg = mt > 0 ? Math.round(mo/mt*100) : null;
+
     const avgColor = avg===null?'#aaa':avg>=80?'var(--green)':avg>=50?'var(--amber)':'var(--red)';
     html += `<td style="text-align:center;color:${avgColor}">${avg===null?'－':avg+'%'}</td>
              <td style="text-align:center;font-size:11px;color:var(--text2)">${mo}/${mr}/${mc}/${ml}</td>`;
   });
-  const grandAvg = grandWorking > 0 ? Math.round((grandOffice+grandClient)/grandWorking*100) : null;
+  const grandAvg = grandTotal > 0 ? Math.round(grandOffice/grandTotal*100) : null;
   const grandColor = grandAvg===null?'#aaa':grandAvg>=80?'var(--green)':grandAvg>=50?'var(--amber)':'var(--red)';
   html += `<td style="text-align:center;font-size:14px;color:${grandColor};background:#d6eaf8">${grandAvg===null?'－':grandAvg+'%'}</td>
            <td style="text-align:center;font-size:11px;color:var(--text2);background:#d6eaf8">${grandOffice}/${grandRemote}/${grandClient}/${grandLeave}</td>`;
