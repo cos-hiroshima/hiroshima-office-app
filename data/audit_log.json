@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17830470814251s4jwyxtzes",
+    "emp_id": "emp001",
+    "emp_name": "西浦 靖裕",
+    "action": "EDIT_EMPLOYEE",
+    "detail": "中村 綾弥",
+    "created_at": "2026-07-03 02:51:21"
+  },
+  {
     "id": "id1783047065692hhllxo4pnw",
     "emp_id": "emp001",
     "emp_name": "西浦 靖裕",
