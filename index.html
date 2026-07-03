@@ -300,6 +300,7 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
       <div class="nav-item" data-page="access" onclick="navigate('access')"><span>🚪</span>入退室記録管理</div>
       <div class="nav-item" data-page="summary" onclick="navigate('summary')"><span>📈</span>出社・テレワーク集計</div>
       <div class="nav-item" data-page="employees" onclick="navigate('employees')"><span>👥</span>社員マスタ</div>
+      <div class="nav-item" data-page="projects" onclick="navigate('projects')"><span>📁</span>プロジェクトマスタ</div>
       <div class="nav-item" data-page="assets" onclick="navigate('assets')"><span>🖥️</span>社内資産管理</div>
       <div class="nav-item" data-page="iplist" onclick="navigate('iplist')"><span>🌐</span>IP管理表</div>
       <div class="nav-item" data-page="keys" onclick="navigate('keys')"><span>🔑</span>鍵管理</div>
@@ -380,7 +381,7 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
         </div>
         <div class="card"><div class="card-body" style="padding:0">
           <table class="tbl"><thead><tr>
-            <th>氏名</th><th>かな</th><th>区分</th><th>勤務区分</th><th>権限</th><th>状態</th><th>PW状態</th><th>最終ログイン</th><th>備考</th>
+            <th>氏名</th><th>かな</th><th>区分</th><th>勤務区分</th><th>PJ</th><th>権限</th><th>状態</th><th>PW状態</th><th>最終ログイン</th><th>備考</th>
             <th class="admin-only" style="width:120px">操作</th>
           </tr></thead><tbody id="empTbody"></tbody></table>
         </div></div>
@@ -561,6 +562,28 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
           </div>
         </div>
       </div>
+      <!-- プロジェクトマスタ -->
+      <div class="page" id="page-projects">
+        <div class="card">
+          <div class="card-header">
+            <h3>📁 プロジェクトマスタ</h3>
+            <div class="hdr-actions">
+              <button class="btn btn-primary btn-sm" onclick="openProjectModal()">＋ 追加</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table class="tbl" id="projectTbl" style="min-width:500px">
+              <thead><tr>
+                <th style="min-width:90px">コード</th>
+                <th style="min-width:160px">プロジェクト名</th>
+                <th style="min-width:200px">備考</th>
+                <th style="min-width:70px">操作</th>
+              </tr></thead>
+              <tbody id="projectTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
       <!-- 操作ログ -->
       <div class="page" id="page-logs">
         <div class="search-box">
@@ -616,6 +639,9 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
           <select class="fc" id="empStatus"><option>在籍</option><option>休職</option><option>退職</option></select>
         </div>
         <div class="fg"><label>入社日</label><input class="fc" id="empJoinDate" type="date"></div>
+      </div>
+      <div class="fg"><label>プロジェクト</label>
+        <select class="fc" id="empProject"></select>
       </div>
       <div class="form-row" style="margin-bottom:12px">
         <div class="form-check"><input type="checkbox" id="empRemote"><label for="empRemote">テレワーク対象</label></div>
@@ -868,6 +894,30 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
   </div>
 </div>
 
+<!-- モーダル: プロジェクト -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3 id="projectModalTitle">プロジェクトを追加</h3>
+      <button class="modal-close" onclick="closeModal('projectModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="projectId">
+      <div class="fg"><label>コード<span class="req">*</span></label>
+        <input class="fc" id="projectCode" placeholder="例：HSW"></div>
+      <div class="fg"><label>プロジェクト名<span class="req">*</span></label>
+        <input class="fc" id="projectName" placeholder="例：広島スマートワーク"></div>
+      <div class="fg"><label>備考</label>
+        <input class="fc" id="projectNote" placeholder="任意メモ"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('projectModal')">キャンセル</button>
+      <button class="btn btn-danger btn-sm" id="projectDeleteBtn" style="margin-right:auto;display:none" onclick="deleteProject()">削除</button>
+      <button class="btn btn-primary" onclick="saveProject()">保存</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -1096,9 +1146,12 @@ async function initApp() {
   await addLog(me.id, me.name, 'LOGIN', 'ログイン成功');
   renderDashboard();
 }
+let projects = [];
 async function loadAll() {
-  [employees, tasks] = await Promise.all([ghRead('employees.json'), ghRead('tasks.json')]);
-  employees = employees || []; tasks = tasks || [];
+  [employees, tasks, projects] = await Promise.all([
+    ghRead('employees.json'), ghRead('tasks.json'), ghRead('projects.json')
+  ]);
+  employees = employees || []; tasks = tasks || []; projects = projects || [];
   attendance = await ghRead('attendance.json') || {};
   updateBadge();
 }
@@ -1125,6 +1178,7 @@ const PAGE_META = {
   tasks:     ['庶務業務管理','担当割当・タスク一覧'],
   employees: ['社員マスタ','社員情報の登録・編集・削除'],
   access:    ['入退室記録管理','入室・退室の記録'],
+  projects:  ['プロジェクトマスタ','PJコード管理'],
   assets:    ['社内資産管理','機器台帳・SPEC管理'],
   iplist:    ['IP管理表','IPアドレス割当管理'],
   keys:      ['鍵管理','鍵台帳・保管場所管理'],
@@ -1156,6 +1210,7 @@ function navigate(page) {
   if (page==='access')    initAccessPage();
   if (page==='summary')   initSummaryPage();
   if (page==='assets')    initAssetsPage();
+  if (page==='projects')  initProjectsPage();
   if (page==='iplist')    initIpPage();
   if (page==='keys')      initKeysPage();
 }
@@ -1217,7 +1272,8 @@ function renderDashboard() {
   active.forEach(e=>{
     const rate=officeRate(e.id);
     const rateColor=rate===null?'#aaa':rate>=80?'var(--green)':rate>=50?'var(--amber)':'var(--red)';
-    calHtml+=`<tr><td class="row-hdr">${e.name}<span style="font-size:9px;border-radius:3px;padding:1px 4px;margin-left:3px;${e.client_site?'background:var(--amber2);color:var(--amber)':'background:var(--sky);color:var(--blue)'}">${e.client_site?'客先':'社内'}</span></td><td style="text-align:center;font-weight:700;font-size:13px;color:${rateColor}">${rate===null?'－':rate+'%'}</td>`;
+    const pjCode2 = e.project_id ? (projects.find(p=>p.id===e.project_id)||{}).code||'' : '';
+    calHtml+=`<tr><td class="row-hdr">${e.name}<span style="font-size:9px;border-radius:3px;padding:1px 4px;margin-left:3px;${e.client_site?'background:var(--amber2);color:var(--amber)':'background:var(--sky);color:var(--blue)'}">${e.client_site?'客先':'社内'}</span>${pjCode2?`<span style="font-size:9px;background:#e8daef;color:#6c3483;border-radius:3px;padding:1px 4px;margin-left:2px">${pjCode2}</span>`:''}</td><td style="text-align:center;font-weight:700;font-size:13px;color:${rateColor}">${rate===null?'－':rate+'%'}</td>`;
     allDays.forEach(d=>{
       const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
       let st=(att[e.id]||{})[d]||null;
@@ -1284,8 +1340,9 @@ function renderCalendar() {
 
   active.forEach(e=>{
     const rate=empRate(e.id);
+    const pjCode = e.project_id ? (projects.find(p=>p.id===e.project_id)||{}).code||'' : '';
     html+=`<tr>
-      <td class="row-hdr">${e.name}<span style="font-size:9px;border-radius:3px;padding:1px 4px;margin-left:3px;${e.client_site?'background:var(--amber2);color:var(--amber)':'background:var(--sky);color:var(--blue)'}">${e.client_site?'客先':'社内'}</span></td>
+      <td class="row-hdr">${e.name}<span style="font-size:9px;border-radius:3px;padding:1px 4px;margin-left:3px;${e.client_site?'background:var(--amber2);color:var(--amber)':'background:var(--sky);color:var(--blue)'}">${e.client_site?'客先':'社内'}</span>${pjCode?`<span style="font-size:9px;background:#e8daef;color:#6c3483;border-radius:3px;padding:1px 4px;margin-left:2px">${pjCode}</span>`:''}</td>
       <td style="text-align:center;font-weight:700;font-size:13px;color:${rateColor(rate)};background:#f8f9fa">${rate===null?'－':rate+'%'}</td>`;
     for(let d=1;d<=days;d++){
       const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
@@ -1454,13 +1511,20 @@ function renderEmployees() {
 }
 
 function openEmpModal(id) {
+  // PJドロップダウン更新
+  const pjSel = document.getElementById('empProject');
+  pjSel.innerHTML = '<option value="">未所属</option>' +
+    projects.map(p=>`<option value="${p.id}">${p.code}</option>`).join('');
+
   if(id){const e=employees.find(e=>e.id===id);if(!e)return;
     document.getElementById('empModalTitle').textContent='社員情報を編集';
     document.getElementById('empId').value=e.id;document.getElementById('empName').value=e.name;document.getElementById('empKana').value=e.name_kana||'';document.getElementById('empType').value=e.emp_type;document.getElementById('empRole').value=e.role;document.getElementById('empStatus').value=e.status;document.getElementById('empJoinDate').value=e.join_date||'';document.getElementById('empRemote').checked=!!e.remote_ok;document.getElementById('empClient').value=e.client_site?'1':'0';document.getElementById('empNote').value=e.note||'';
+    document.getElementById('empProject').value=e.project_id||'';
   } else {
     document.getElementById('empModalTitle').textContent='社員を追加';
     document.getElementById('empId').value='';['empName','empKana','empNote'].forEach(x=>document.getElementById(x).value='');
-    document.getElementById('empType').value='社員';document.getElementById('empRole').value='member';document.getElementById('empStatus').value='在籍';document.getElementById('empJoinDate').value='';document.getElementById('empRemote').checked=true;document.getElementById('empClient').value='0';
+    document.getElementById('empType').value='社員';document.getElementById('empRole').value='member';document.getElementById('empStatus').value='在籍';document.getElementById('empJoinDate').value='';
+    document.getElementById('empProject').value='';document.getElementById('empRemote').checked=true;document.getElementById('empClient').value='0';
   }
   openModal('empModal');
 }
@@ -1468,7 +1532,8 @@ function openEmpModal(id) {
 async function saveEmployee() {
   const id=document.getElementById('empId').value;
   const n=now();
-  const data={id:id||('emp'+Date.now()),name:document.getElementById('empName').value.trim(),name_kana:document.getElementById('empKana').value.trim(),emp_type:document.getElementById('empType').value,status:document.getElementById('empStatus').value,role:document.getElementById('empRole').value,email:'',remote_ok:document.getElementById('empRemote').checked?1:0,client_site:document.getElementById('empClient').value==='1'?1:0,join_date:document.getElementById('empJoinDate').value,note:document.getElementById('empNote').value.trim(),created_at:n,updated_at:n,has_password:0,last_login:null};
+  const data={id:id||('emp'+Date.now()),name:document.getElementById('empName').value.trim(),name_kana:document.getElementById('empKana').value.trim(),emp_type:document.getElementById('empType').value,status:document.getElementById('empStatus').value,role:document.getElementById('empRole').value,email:'',remote_ok:document.getElementById('empRemote').checked?1:0,client_site:document.getElementById('empClient').value==='1'?1:0,join_date:document.getElementById('empJoinDate').value,
+    project_id:document.getElementById('empProject').value||null,note:document.getElementById('empNote').value.trim(),created_at:n,updated_at:n,has_password:0,last_login:null};
   if(!data.name){toast('氏名を入力してください',true);return;}
   if(id){const idx=employees.findIndex(e=>e.id===id);if(idx!==-1){data.has_password=employees[idx].has_password;data.last_login=employees[idx].last_login;employees[idx]=data;}else employees.push(data);}
   else{employees.push(data);const auths=await ghRead('auth.json')||[];auths.push({emp_id:data.id,password_hash:null,must_change:1,last_login:null});await ghWrite('auth.json',auths);alert(`追加しました。\n社員ID: ${data.id}\n初回ログイン時にパスワードを設定します。`);}
@@ -2374,6 +2439,80 @@ function downloadSummaryCSV() {
   const a = document.createElement('a');
   a.href = url; a.download = `出社テレワーク集計_${from}_${to}.csv`; a.click();
   URL.revokeObjectURL(url);
+}
+
+// ════ プロジェクトマスタ ════
+async function initProjectsPage() {
+  projects = await ghRead('projects.json') || [];
+  renderProjects();
+}
+
+function renderProjects() {
+  const tbody = document.getElementById('projectTbody');
+  if (!projects.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">プロジェクトが登録されていません</td></tr>';
+    return;
+  }
+  tbody.innerHTML = projects.map(p => `<tr>
+    <td style="font-weight:700;color:var(--blue)">${p.code}</td>
+    <td>${p.name}</td>
+    <td style="font-size:11px;color:var(--gray)">${p.note||'－'}</td>
+    <td><button class="btn btn-secondary btn-sm" onclick="openProjectModal('${p.id}')">編集</button></td>
+  </tr>`).join('');
+}
+
+function openProjectModal(id) {
+  if (id) {
+    const p = projects.find(p=>p.id===id);
+    if (!p) return;
+    document.getElementById('projectModalTitle').textContent = 'プロジェクトを編集';
+    document.getElementById('projectId').value   = p.id;
+    document.getElementById('projectCode').value = p.code;
+    document.getElementById('projectName').value = p.name;
+    document.getElementById('projectNote').value = p.note||'';
+    document.getElementById('projectDeleteBtn').style.display = '';
+  } else {
+    document.getElementById('projectModalTitle').textContent = 'プロジェクトを追加';
+    ['projectId','projectCode','projectName','projectNote'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('projectDeleteBtn').style.display = 'none';
+  }
+  openModal('projectModal');
+}
+
+async function saveProject() {
+  const id   = document.getElementById('projectId').value;
+  const code = document.getElementById('projectCode').value.trim();
+  const name = document.getElementById('projectName').value.trim();
+  if (!code || !name) { toast('コードとプロジェクト名は必須です', true); return; }
+  const n = now();
+  const data = {
+    id:   id || uuid(), code, name,
+    note: document.getElementById('projectNote').value.trim(),
+    created_at: id ? (projects.find(p=>p.id===id)||{}).created_at||n : n,
+    updated_at: n
+  };
+  if (id) { const idx=projects.findIndex(p=>p.id===id); if(idx!==-1) projects[idx]=data; else projects.push(data); }
+  else projects.push(data);
+  try {
+    await ghWrite('projects.json', projects);
+    closeModal('projectModal');
+    renderProjects();
+    await addLog(me.id, me.name, id?'EDIT_PROJECT':'ADD_PROJECT', code);
+    toast('✅ 保存しました');
+  } catch(e) { toast('保存エラー: '+e.message, true); }
+}
+
+async function deleteProject() {
+  const id = document.getElementById('projectId').value;
+  const p  = projects.find(p=>p.id===id);
+  if (!confirm(`「${p?.code}」を削除しますか？`)) return;
+  projects = projects.filter(p=>p.id!==id);
+  try {
+    await ghWrite('projects.json', projects);
+    closeModal('projectModal');
+    renderProjects();
+    toast('🗑️ 削除しました');
+  } catch(e) { toast('削除エラー', true); }
 }
 
 // ════ 操作ログ ════
