@@ -1220,7 +1220,7 @@ async function doLoginWithHash(h) {
   if (!auth || auth.password_hash !== h) throw new Error('IDまたはパスワードが違います');
   const emp = employees.find(e => e.id === loginEmpId);
   auth.last_login = now();
-  await ghWrite('auth.json', auths);
+  try { await ghWrite('auth.json', auths); } catch(e) {}
   me = emp;
   localStorage.setItem('hiroshima_session', JSON.stringify({ empId: emp.id, empName: emp.name, role: emp.role }));
   await initApp();
@@ -1264,7 +1264,7 @@ async function initApp() {
   document.getElementById('sidebarRole').textContent = me.role === 'admin' ? '（管理者）' : '';
   if (isAdmin()) document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
   await loadAll();
-  await addLog(me.id, me.name, 'LOGIN', 'ログイン成功');
+  try { await addLog(me.id, me.name, 'LOGIN', 'ログイン成功'); } catch(e) {}
   renderDashboard();
 }
 let projects = [];
