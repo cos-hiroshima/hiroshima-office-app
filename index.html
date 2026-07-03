@@ -113,7 +113,9 @@ html,body{height:100%;font-family:var(--font);color:var(--text);background:#f0f3
 
 /* 業務カード */
 .task-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
-.task-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:13px 15px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.task-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:13px 15px;cursor:pointer;transition:box-shadow .15s,border-color .15s,background .15s}
+.task-card.confirmed{background:#f5f5f5;border-color:#ddd}
+.task-card.confirmed:hover{background:#efefef}
 .task-card:hover{box-shadow:0 4px 16px rgba(26,39,68,.13);border-color:var(--blue2)}
 .tc-cat{font-size:10px;color:var(--gray);margin-bottom:3px}
 .tc-header{display:flex;align-items:flex-start;gap:7px;margin-bottom:7px}
@@ -1433,7 +1435,7 @@ function renderTasks() {
   const grid=document.getElementById('taskGrid');
   if(!list.length){grid.innerHTML='<div class="empty">該当する業務がありません</div>';return;}
   const rot={fixed:'固定',weekly:'週次',monthly:'月次',oncall:'出社者対応'};
-  grid.innerHTML=list.map(t=>`<div class="task-card" onclick="openTaskModal('${t.id}')">
+  grid.innerHTML=list.map(t=>`<div class="task-card${t.status==='確定'?' confirmed':''}" onclick="openTaskModal('${t.id}')">
     <div class="tc-cat">${t.category} · ${t.frequency} · ${rot[t.rotation_type]||t.rotation_type}</div>
     <div class="tc-header"><div class="tc-title">${t.title}</div>
       <span class="badge badge-${t.priority==='高'?'high':t.priority==='中'?'mid':'low'}">${t.priority}</span>
