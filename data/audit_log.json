@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17830470015659i2xfjo9uqs",
+    "emp_id": "emp001",
+    "emp_name": "西浦 靖裕",
+    "action": "EDIT_EMPLOYEE",
+    "detail": "藤原 温大",
+    "created_at": "2026-07-03 02:50:01"
+  },
+  {
     "id": "id1783046992340ls0mrhljaj",
     "emp_id": "emp001",
     "emp_name": "西浦 靖裕",
