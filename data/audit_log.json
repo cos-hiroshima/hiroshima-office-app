@@ -1,5 +1,13 @@
 [
   {
+    "id": "id178304496879043gp0t5b0g4",
+    "emp_id": "emp001",
+    "emp_name": "西浦",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "西浦 2026-07/2→出社",
+    "created_at": "2026-07-03 02:16:08"
+  },
+  {
     "id": "id1783044942343w80qzjqzxag",
     "emp_id": "emp001",
     "emp_name": "西浦",
