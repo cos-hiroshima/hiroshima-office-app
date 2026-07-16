@@ -1445,8 +1445,8 @@ function renderCalendar() {
 
   let html=`<table class="cal-table" style="min-width:${60+60+44*days}px"><tr>`;
   html+=`<th class="col-name" style="min-width:80px">氏名</th>`;
-  html+=`<th class="col-date" style="min-width:64px;background:var(--blue);font-size:10px;line-height:1.3">出社率<br><span style="font-weight:400;opacity:.8">${isCurrentMonth?'月中':'月締め'}</span></th>`;
-  for(let d=1;d<=days;d++){
+  html+=`<th class="col-date" style="min-width:64px;background:var(--blue);fostyle="min-width:64px;background:var(--blue);font-size:11px">出社率</th>`;
+  for( d=1;d<=days;d++){
     const dw=dow(calYear,calMonth,d),hol=isHol(calYear,calMonth,d);
     const cls=hol?'col-date hol':dw===6?'col-date sat':dw===0?'col-date sun':'col-date';
     const today_mark=(d===todayD&&calYear===today.getFullYear()&&calMonth===today.getMonth()+1)?'border-bottom:3px solid #f39c12':'';
