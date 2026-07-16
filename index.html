@@ -1438,6 +1438,7 @@ function renderCalendar() {
   const allDays=[]; for(let d=1;d<=days;d++) allDays.push(d);
   const wdays=allDays.filter(d=>{const dw=dow(calYear,calMonth,d);return dw!==0&&dw!==6&&!isHol(calYear,calMonth,d);});
   const pastWdays=wdays.filter(d=>d<=todayD);
+  const isCurrentMonth=(calYear===today.getFullYear()&&calMonth===today.getMonth()+1);
 
   // 出社率は常に月間稼働日数（全平日）を分母にする
   function empRate(empId){ return calcOfficeRate(empId, wdays, att); }
