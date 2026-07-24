@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1784859210207fw99qjadp4j",
+    "emp_id": "emp010",
+    "emp_name": "陶山 涼",
+    "action": "EDIT_IP",
+    "detail": "192.168.121.12",
+    "created_at": "2026-07-24 02:13:30"
+  },
+  {
     "id": "id1784858897978lo5qw7spar",
     "emp_id": "emp010",
     "emp_name": "陶山 涼",
