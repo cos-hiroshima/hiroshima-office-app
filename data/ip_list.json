@@ -4,7 +4,7 @@
     "prev_ip": "",
     "ip": "192.168.121.12",
     "term_id": "DESKTOP-O3KU064",
-    "manager_id": null,
+    "manager_id": "emp001",
     "type": "クライアントPC",
     "asset_no": "cos-1-1-263",
     "purpose": "開発",
@@ -13,7 +13,7 @@
     "note": "ノート",
     "active": 1,
     "created_at": "2026-07-24 01:58:40",
-    "updated_at": "2026-07-24 02:05:04"
+    "updated_at": "2026-07-24 02:13:27"
   },
   {
     "id": "id1784858781279j0wdcnjmvq1",
