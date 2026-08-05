@@ -197,5 +197,23 @@
     "updated_at": "2026-07-03 02:51:19",
     "has_password": 0,
     "last_login": null
+  },
+  {
+    "id": "emp1785908418107",
+    "name": "宗東佑美",
+    "name_kana": "ムネトウユミ",
+    "emp_type": "社員",
+    "status": "在籍",
+    "role": "member",
+    "email": "",
+    "remote_ok": 1,
+    "client_site": 0,
+    "join_date": "2024-04-01",
+    "project_id": "id1783046921267wokrwpzxbjo",
+    "note": "",
+    "created_at": "2026-08-05 05:40:18",
+    "updated_at": "2026-08-05 05:40:18",
+    "has_password": 0,
+    "last_login": null
   }
 ]
