@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1785908432762wrg99atf1ml",
+    "emp_id": "emp002",
+    "emp_name": "山下 栞奈",
+    "action": "ADD_EMPLOYEE",
+    "detail": "宗東佑美",
+    "created_at": "2026-08-05 05:40:32"
+  },
+  {
     "id": "id1785908320951jmtrgi1g0yo",
     "emp_id": "emp002",
     "emp_name": "山下 栞奈",
