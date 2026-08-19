@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17871138759972u4poscbt3o",
+    "emp_id": "emp006",
+    "emp_name": "",
+    "action": "SETUP_PASSWORD",
+    "detail": "初回パスワード設定",
+    "created_at": "2026-08-19 04:31:15"
+  },
+  {
     "id": "id1787113792287lf01nucgesp",
     "emp_id": "emp002",
     "emp_name": "山下 栞奈",
