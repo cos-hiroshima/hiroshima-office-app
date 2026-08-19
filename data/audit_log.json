@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17871138856612qddfm2r1oo",
+    "emp_id": "emp006",
+    "emp_name": "藤原 温大",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-08-19 04:31:25"
+  },
+  {
     "id": "id1787113882045g102rmganjf",
     "emp_id": "emp006",
     "emp_name": "藤原 温大",
