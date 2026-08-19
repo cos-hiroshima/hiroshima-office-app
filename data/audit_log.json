@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1787115502030cbtc0w9ie0o",
+    "emp_id": "emp006",
+    "emp_name": "藤原 温大",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "藤原 温大 2026-09/2→在宅",
+    "created_at": "2026-08-19 04:58:22"
+  },
+  {
     "id": "id1787115498879zw80pejzeo",
     "emp_id": "emp006",
     "emp_name": "藤原 温大",
