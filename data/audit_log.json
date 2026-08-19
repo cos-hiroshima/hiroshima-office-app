@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1787115589312p800tgcrrc",
+    "emp_id": "emp002",
+    "emp_name": "山下 栞奈",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-08-19 04:59:49"
+  },
+  {
     "id": "id1787115567165am461fy08u",
     "emp_id": "emp002",
     "emp_name": "山下 栞奈",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_TASK",
     "detail": "「Teams入退室記録確認」",
     "created_at": "2026-06-22 07:38:59"
-  },
-  {
-    "id": "id1782113863866laovbqfob8q",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-06-22 07:37:43"
   }
 ]
