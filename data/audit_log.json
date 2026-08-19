@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1787114091186pa1yyr7dnao",
+    "emp_id": "emp007",
+    "emp_name": "濱口 夏野",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-08-19 04:34:51"
+  },
+  {
     "id": "id1787114088592qm9grz8g0i9",
     "emp_id": "emp007",
     "emp_name": "",
