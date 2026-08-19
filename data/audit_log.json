@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1787114115962nihwcojnhzr",
+    "emp_id": "emp007",
+    "emp_name": "濱口 夏野",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-08-19 04:35:15"
+  },
+  {
     "id": "id1787114102318qool247nnbe",
     "emp_id": "emp002",
     "emp_name": "山下 栞奈",
