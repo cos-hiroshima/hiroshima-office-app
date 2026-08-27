@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1787824785533dr3555oi9f6",
+    "emp_id": "emp002",
+    "emp_name": "山下 栞奈",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-08-27 09:59:45"
+  },
+  {
     "id": "id1787788397756mne42u63ew8",
     "emp_id": "emp007",
     "emp_name": "濱口 夏野",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "西浦 2026-06/1→在宅",
     "created_at": "2026-06-23 00:15:40"
-  },
-  {
-    "id": "id1782173739335podgptulq8g",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "西浦 2026-06/1→出社",
-    "created_at": "2026-06-23 00:15:39"
   }
 ]
