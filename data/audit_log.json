@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1787876132895fh6kvrkssip",
+    "emp_id": "emp001",
+    "emp_name": "西浦 靖裕",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-08-28 00:15:32"
+  },
+  {
     "id": "id1787876127414sl0htzwnvk",
     "emp_id": "emp001",
     "emp_name": "",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "西浦 2026-06/1→客先",
     "created_at": "2026-06-23 00:15:46"
-  },
-  {
-    "id": "id1782173744978xjlfa8qg8j",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "西浦 2026-06/1→有休",
-    "created_at": "2026-06-23 00:15:44"
   }
 ]
