@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788134104671xpfya3nvaig",
+    "emp_id": "emp007",
+    "emp_name": "濱口 夏野",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "クニサキ 望里 2026-11/18→客先",
+    "created_at": "2026-08-30 23:55:04"
+  },
+  {
     "id": "id17881341021316c9v8esaxdn",
     "emp_id": "emp007",
     "emp_name": "濱口 夏野",
@@ -2390,13 +2398,5 @@
     "action": "LOGIN",
     "detail": "ログイン成功",
     "created_at": "2026-06-23 00:21:11"
-  },
-  {
-    "id": "id1782173759075hio43cwhg3k",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "西浦 2026-06/1→有休",
-    "created_at": "2026-06-23 00:15:59"
   }
 ]
