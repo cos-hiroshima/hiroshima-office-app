@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788227591561yxj60toxu6",
+    "emp_id": "emp015",
+    "emp_name": "宗東佑美",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "宗東佑美 2026-09/7→出社",
+    "created_at": "2026-09-01 01:53:11"
+  },
+  {
     "id": "id1788227587251ba43lyuv8qg",
     "emp_id": "emp015",
     "emp_name": "宗東佑美",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "山下 2026-06/1→在宅",
     "created_at": "2026-06-23 01:22:26"
-  },
-  {
-    "id": "id1782177653994au7nmi21bt5",
-    "emp_id": "emp010",
-    "emp_name": "陶山",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-06-23 01:20:53"
   }
 ]
