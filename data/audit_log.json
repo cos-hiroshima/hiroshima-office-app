@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788226789826m8cevz0fxf",
+    "emp_id": "emp001",
+    "emp_name": "西浦 靖裕",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-09-01 01:39:49"
+  },
+  {
     "id": "id178822595776823pzst4uwuq",
     "emp_id": "emp001",
     "emp_name": "西浦 靖裕",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_TASK",
     "detail": "「突発・個別対応の報告・判断」",
     "created_at": "2026-06-23 00:56:37"
-  },
-  {
-    "id": "id1782176155554qrgg7vxmwr",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "EDIT_TASK",
-    "detail": "「入退室記録確認」",
-    "created_at": "2026-06-23 00:55:55"
   }
 ]
