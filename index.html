@@ -1651,7 +1651,11 @@ function openEmpModal(id) {
 async function saveEmployee() {
   const id=document.getElementById('empId').value;
   const n=now();
-  const data={id:id||('emp'+Date.now()),name:document.getElementById('empName').value.trim(),name_kana:document.getElementById('empKana').value.trim(),emp_type:document.getElementById('empType').value,status:document.getElementById('empStatus').value,role:document.getElementById('empRole').value,email:'',remote_ok:document.getElementById('empRemote').checked?1:0,client_site:document.getElementById('empClient').value==='1'?1:0,join_date:document.getElementById('empJoinDate').value,
+  const nextEmpId=(()=>{
+    const nums=employees.map(e=>{const m=(e.id||'').match(/^emp(\d{3})$/);return m?parseInt(m[1]):0;});
+    return 'emp'+String(Math.max(0,...nums)+1).padStart(3,'0');
+  })();
+  const data={id:id||nextEmpId,name:document.getElementById('empName').value.trim(),name_kana:document.getElementById('empKana').value.trim(),emp_type:document.getElementById('empType').value,status:document.getElementById('empStatus').value,role:document.getElementById('empRole').value,email:'',remote_ok:document.getElementById('empRemote').checked?1:0,client_site:document.getElementById('empClient').value==='1'?1:0,join_date:document.getElementById('empJoinDate').value,
     project_id:document.getElementById('empProject').value||null,note:document.getElementById('empNote').value.trim(),created_at:n,updated_at:n,has_password:0,last_login:null};
   if(!data.name){toast('氏名を入力してください',true);return;}
   if(id){const idx=employees.findIndex(e=>e.id===id);if(idx!==-1){data.has_password=employees[idx].has_password;data.last_login=employees[idx].last_login;employees[idx]=data;}else employees.push(data);}
