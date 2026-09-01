@@ -1616,6 +1616,7 @@ function renderEmployees() {
   const tbody=document.getElementById('empTbody');
   if(!list.length){tbody.innerHTML=`<tr><td colspan="10" class="empty">該当する社員がいません</td></tr>`;return;}
   tbody.innerHTML=list.map(e=>`<tr>
+    <td style="font-size:11px;color:var(--gray);font-family:monospace">${e.id}</td>
     <td><strong>${e.name}</strong></td><td>${e.name_kana||'－'}</td>
     <td><span class="badge badge-blue">${e.emp_type}</span></td>
     <td><span class="badge badge-${e.role==='admin'?'navy':'gray'}">${e.role==='admin'?'管理者':'一般'}</span></td>
