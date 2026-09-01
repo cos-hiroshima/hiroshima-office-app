@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17882272024241qcozant8bpi",
+    "emp_id": "emp002",
+    "emp_name": "山下 栞奈",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "山下 栞奈 2026-09/7→在宅",
+    "created_at": "2026-09-01 01:46:42"
+  },
+  {
     "id": "id1788227183395wtbvct3sx5f",
     "emp_id": "emp014",
     "emp_name": "中村 綾弥",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_TASK",
     "detail": "「サーバー室・社内資産確認」",
     "created_at": "2026-06-23 01:14:10"
-  },
-  {
-    "id": "id1782177212081a1m7np5ofa6",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-06-23 01:13:32"
   }
 ]
