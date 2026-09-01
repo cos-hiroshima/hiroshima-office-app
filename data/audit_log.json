@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788239829138nzstpxz6rh",
+    "emp_id": "emp015",
+    "emp_name": "宗東佑美",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "宗東佑美 2026-09/9→未入力",
+    "created_at": "2026-09-01 05:17:09"
+  },
+  {
     "id": "id1788239825800olajwkci7nk",
     "emp_id": "emp015",
     "emp_name": "宗東佑美",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "西浦 2026-06/17→未入力",
     "created_at": "2026-06-23 01:39:57"
-  },
-  {
-    "id": "id178217879531901nfwv5fgla9",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "西浦 2026-06/17→有休",
-    "created_at": "2026-06-23 01:39:55"
   }
 ]
