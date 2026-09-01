@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17882272304414vjbjuajnqv",
+    "emp_id": "emp014",
+    "emp_name": "中村 綾弥",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "中村 綾弥 2026-09/7→客先",
+    "created_at": "2026-09-01 01:47:10"
+  },
+  {
     "id": "id1788227228917vz69rkfzg1o",
     "emp_id": "emp014",
     "emp_name": "中村 綾弥",
@@ -2390,13 +2398,5 @@
     "action": "LOGIN",
     "detail": "ログイン成功",
     "created_at": "2026-06-23 01:19:34"
-  },
-  {
-    "id": "id1782177532706kdblndlkep",
-    "emp_id": "emp002",
-    "emp_name": "山下",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-06-23 01:18:52"
   }
 ]
