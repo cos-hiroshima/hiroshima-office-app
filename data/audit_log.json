@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788227587251ba43lyuv8qg",
+    "emp_id": "emp015",
+    "emp_name": "宗東佑美",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "宗東佑美 2026-09/4→出社",
+    "created_at": "2026-09-01 01:53:07"
+  },
+  {
     "id": "id1788227585833r608qsdlh18",
     "emp_id": "emp015",
     "emp_name": "宗東佑美",
@@ -2390,13 +2398,5 @@
     "action": "LOGIN",
     "detail": "ログイン成功",
     "created_at": "2026-06-23 01:20:53"
-  },
-  {
-    "id": "id178217764951938jxuohtflh",
-    "emp_id": "emp010",
-    "emp_name": "",
-    "action": "SETUP_PASSWORD",
-    "detail": "初回パスワード設定",
-    "created_at": "2026-06-23 01:20:49"
   }
 ]
