@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788224315813udz8rypsgpo",
+    "emp_id": "emp001",
+    "emp_name": "西浦 靖裕",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-09-01 00:58:35"
+  },
+  {
     "id": "id1788224182715nb6qpcda2gf",
     "emp_id": "emp001",
     "emp_name": "西浦 靖裕",
@@ -2390,13 +2398,5 @@
     "action": "LOGIN",
     "detail": "ログイン成功",
     "created_at": "2026-06-23 00:43:48"
-  },
-  {
-    "id": "id17821751566667s9ryy8b19l",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "EDIT_TASK",
-    "detail": "「出社・テレワーク状況集計」",
-    "created_at": "2026-06-23 00:39:16"
   }
 ]
