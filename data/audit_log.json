@@ -1,5 +1,13 @@
 [
   {
+    "id": "id178822595776823pzst4uwuq",
+    "emp_id": "emp001",
+    "emp_name": "西浦 靖裕",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-09-01 01:25:57"
+  },
+  {
     "id": "id1788225330628h58v3i9o1ld",
     "emp_id": "emp001",
     "emp_name": "西浦 靖裕",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_TASK",
     "detail": "「入退室記録確認」",
     "created_at": "2026-06-23 00:55:55"
-  },
-  {
-    "id": "id178217606131993oxg1t7ecl",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "EDIT_TASK",
-    "detail": "「保険証・郵便物の受領・保管」",
-    "created_at": "2026-06-23 00:54:21"
   }
 ]
