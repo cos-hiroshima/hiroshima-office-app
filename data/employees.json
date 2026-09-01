@@ -32,22 +32,6 @@
     "updated_at": "2026-07-03 02:49:33"
   },
   {
-    "id": "emp003",
-    "name": "鈴木 隆士",
-    "name_kana": "スズキ タカシ",
-    "emp_type": "社員",
-    "status": "在籍",
-    "role": "member",
-    "email": "",
-    "remote_ok": 1,
-    "client_site": 0,
-    "join_date": "2020-04-01",
-    "project_id": "pj003",
-    "note": "",
-    "created_at": "2026-07-03 02:49:42",
-    "updated_at": "2026-07-03 02:49:42"
-  },
-  {
     "id": "emp004",
     "name": "戸田 勝也",
     "name_kana": "トダ カツヤ",
