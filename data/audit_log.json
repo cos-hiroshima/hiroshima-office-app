@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17882270778348198778pfj",
+    "emp_id": "emp014",
+    "emp_name": "中村 綾弥",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-09-01 01:44:37"
+  },
+  {
     "id": "id17882270750713g9qq2kdr78",
     "emp_id": "emp014",
     "emp_name": "",
@@ -2390,13 +2398,5 @@
     "action": "SETUP_PASSWORD",
     "detail": "初回パスワード設定",
     "created_at": "2026-06-23 01:13:24"
-  },
-  {
-    "id": "id1782177001320y24njaosbbk",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-06-23 01:10:01"
   }
 ]
