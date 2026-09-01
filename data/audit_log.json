@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17882241623789phz4nczmee",
+    "emp_id": "emp001",
+    "emp_name": "西浦 靖裕",
+    "action": "EDIT_EMPLOYEE",
+    "detail": "宗東佑美",
+    "created_at": "2026-09-01 00:56:02"
+  },
+  {
     "id": "id178822411389586ccxq2uxbt",
     "emp_id": "emp001",
     "emp_name": "西浦 靖裕",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_EMPLOYEE",
     "detail": "クニサキ",
     "created_at": "2026-06-23 00:38:15"
-  },
-  {
-    "id": "id1782175080308l09coz0pe3p",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "EDIT_EMPLOYEE",
-    "detail": "山下",
-    "created_at": "2026-06-23 00:38:00"
   }
 ]
