@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788484743745bnyiy2kkgc",
+    "emp_id": "emp011",
+    "emp_name": "クニサキ 望里",
+    "action": "LOGOUT",
+    "detail": "ログアウト",
+    "created_at": "2026-09-04 01:19:03"
+  },
+  {
     "id": "id1788484719482qt433n37eqg",
     "emp_id": "emp011",
     "emp_name": "クニサキ 望里",
@@ -2390,13 +2398,5 @@
     "action": "LOGOUT",
     "detail": "ログアウト",
     "created_at": "2026-06-23 03:10:02"
-  },
-  {
-    "id": "id1782183913481prns1yoyq6",
-    "emp_id": "emp011",
-    "emp_name": "クニサキ",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-06-23 03:05:13"
   }
 ]
