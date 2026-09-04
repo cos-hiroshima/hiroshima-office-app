@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788489186789ar28qhl3tmc",
+    "emp_id": "emp011",
+    "emp_name": "クニサキ 望里",
+    "action": "ADD_KEY",
+    "detail": "入口⑦（広島）",
+    "created_at": "2026-09-04 02:33:06"
+  },
+  {
     "id": "id17884891094348p6gx0k4x3h",
     "emp_id": "emp011",
     "emp_name": "クニサキ 望里",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "西浦 2026-07/2→出社",
     "created_at": "2026-07-03 02:16:08"
-  },
-  {
-    "id": "id1783044942343w80qzjqzxag",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-07-03 02:15:42"
   }
 ]
