@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788490134252yi48n87sb6h",
+    "emp_id": "emp011",
+    "emp_name": "クニサキ 望里",
+    "action": "DELETE_KEY",
+    "detail": "L1-2",
+    "created_at": "2026-09-04 02:48:54"
+  },
+  {
     "id": "id1788490128724heox1sstvba",
     "emp_id": "emp011",
     "emp_name": "クニサキ 望里",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_EMPLOYEE",
     "detail": "山下 栞奈",
     "created_at": "2026-07-03 02:49:34"
-  },
-  {
-    "id": "id178304695989278hljinzcun",
-    "emp_id": "emp001",
-    "emp_name": "西浦 靖裕",
-    "action": "EDIT_EMPLOYEE",
-    "detail": "西浦 靖裕",
-    "created_at": "2026-07-03 02:49:19"
   }
 ]
