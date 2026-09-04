@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788489036822s60g77e3wl",
+    "emp_id": "emp011",
+    "emp_name": "クニサキ 望里",
+    "action": "EDIT_KEY",
+    "detail": "入口④（広島）*マスター",
+    "created_at": "2026-09-04 02:30:36"
+  },
+  {
     "id": "id1788489009683m7lyfde7qvs",
     "emp_id": "emp011",
     "emp_name": "クニサキ 望里",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_TASK",
     "detail": "「ALSOK開閉通知・緊急連絡対応」",
     "created_at": "2026-07-03 02:13:25"
-  },
-  {
-    "id": "id1783044740898y70umkd4v1p",
-    "emp_id": "emp001",
-    "emp_name": "西浦",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-07-03 02:12:20"
   }
 ]
