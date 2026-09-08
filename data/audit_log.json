@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1788911974796b4vq61yzn29",
+    "emp_id": "emp007",
+    "emp_name": "濱口 夏野",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "濱口 夏野 2026-09/11→在宅",
+    "created_at": "2026-09-08 23:59:34"
+  },
+  {
     "id": "id1788911972448mb464db0iil",
     "emp_id": "emp007",
     "emp_name": "濱口 夏野",
@@ -2390,13 +2398,5 @@
     "action": "LOGIN",
     "detail": "ログイン成功",
     "created_at": "2026-07-03 03:02:07"
-  },
-  {
-    "id": "id1783047635744fr2ap0u0mzm",
-    "emp_id": "emp001",
-    "emp_name": "西浦 靖裕",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-07-03 03:00:35"
   }
 ]
