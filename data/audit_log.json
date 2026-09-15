@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1789431745873p6qlcyjeoua",
+    "emp_id": "emp015",
+    "emp_name": "宗東佑美",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "宗東佑美 2026-09/17→客先",
+    "created_at": "2026-09-15 00:22:25"
+  },
+  {
     "id": "id1789431744188ri9dc09fst",
     "emp_id": "emp015",
     "emp_name": "宗東佑美",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "西浦 靖裕 2026-07/16→未入力",
     "created_at": "2026-07-16 05:16:17"
-  },
-  {
-    "id": "id1784178973151sktcgtszy6",
-    "emp_id": "emp001",
-    "emp_name": "西浦 靖裕",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "西浦 靖裕 2026-07/16→客先",
-    "created_at": "2026-07-16 05:16:13"
   }
 ]
