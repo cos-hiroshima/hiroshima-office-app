@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1790898762332e3uu09poyp",
+    "emp_id": "emp010",
+    "emp_name": "陶山 涼",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-10-01 23:52:42"
+  },
+  {
     "id": "id1790759292019271esnt3eqv",
     "emp_id": "emp014",
     "emp_name": "中村 綾弥",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "山下 栞奈 2026-08/18→出社",
     "created_at": "2026-08-19 04:31:40"
-  },
-  {
-    "id": "id17871138990208k4n20skqfo",
-    "emp_id": "emp002",
-    "emp_name": "山下 栞奈",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "山下 栞奈 2026-08/17→在宅",
-    "created_at": "2026-08-19 04:31:39"
   }
 ]
