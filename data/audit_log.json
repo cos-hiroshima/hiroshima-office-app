@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1791167621044w56hysk46on",
+    "emp_id": "emp015",
+    "emp_name": "宗東佑美",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "宗東佑美 2026-10/9→在宅",
+    "created_at": "2026-10-05 02:33:41"
+  },
+  {
     "id": "id1791167613909e1emahxq6oh",
     "emp_id": "emp015",
     "emp_name": "宗東佑美",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "濱口 夏野 2026-08/27→出社",
     "created_at": "2026-08-19 04:36:57"
-  },
-  {
-    "id": "id1787114214823wmupfse6z5s",
-    "emp_id": "emp007",
-    "emp_name": "濱口 夏野",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "濱口 夏野 2026-08/25→出社",
-    "created_at": "2026-08-19 04:36:54"
   }
 ]
