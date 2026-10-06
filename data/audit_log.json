@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17913308997160f6wc7pqf4e9",
+    "emp_id": "emp007",
+    "emp_name": "濱口 夏野",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-10-06 23:54:59"
+  },
+  {
     "id": "id1791244037906cdf3kll19yg",
     "emp_id": "emp007",
     "emp_name": "濱口 夏野",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "山下 栞奈 2026-09/1→未入力",
     "created_at": "2026-08-19 04:37:22"
-  },
-  {
-    "id": "id1787114240718akq2nza0uw6",
-    "emp_id": "emp007",
-    "emp_name": "濱口 夏野",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "山下 栞奈 2026-09/1→休日",
-    "created_at": "2026-08-19 04:37:20"
   }
 ]
