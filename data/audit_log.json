@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1791360194634i8zdhblyst",
+    "emp_id": "emp006",
+    "emp_name": "藤原 温大",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "藤原 温大 2026-10/21→在宅",
+    "created_at": "2026-10-07 08:03:14"
+  },
+  {
     "id": "id1791360186225hy3cbaotiht",
     "emp_id": "emp006",
     "emp_name": "藤原 温大",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "藤原 温大 2026-09/9→休日",
     "created_at": "2026-08-19 04:58:13"
-  },
-  {
-    "id": "id1787115486581iw0mqc86q9h",
-    "emp_id": "emp006",
-    "emp_name": "藤原 温大",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "藤原 温大 2026-09/9→在宅",
-    "created_at": "2026-08-19 04:58:06"
   }
 ]
