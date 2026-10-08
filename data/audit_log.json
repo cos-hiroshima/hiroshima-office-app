@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17914184096088on4cuawx95",
+    "emp_id": "emp006",
+    "emp_name": "藤原 温大",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "森口 祥子 2026-10/12→在宅",
+    "created_at": "2026-10-08 00:13:29"
+  },
+  {
     "id": "id1791418395946fi8l96jhcz",
     "emp_id": "emp006",
     "emp_name": "藤原 温大",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "藤原 温大 2026-09/7→在宅",
     "created_at": "2026-08-19 05:00:23"
-  },
-  {
-    "id": "id1787115617598jmnd4y1u13o",
-    "emp_id": "emp002",
-    "emp_name": "山下 栞奈",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "山下 栞奈 2026-09/25→在宅",
-    "created_at": "2026-08-19 05:00:17"
   }
 ]
