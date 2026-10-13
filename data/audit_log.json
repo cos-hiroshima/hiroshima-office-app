@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1791879911812i0gcrr1pwgg",
+    "emp_id": "emp010",
+    "emp_name": "陶山 涼",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "陶山 涼 2026-10/9→出社",
+    "created_at": "2026-10-13 08:25:11"
+  },
+  {
     "id": "id17918799079594aafbixea2",
     "emp_id": "emp010",
     "emp_name": "陶山 涼",
@@ -2390,13 +2398,5 @@
     "action": "LOGIN",
     "detail": "ログイン成功",
     "created_at": "2026-08-30 23:54:49"
-  },
-  {
-    "id": "id1788133996169ny68mpmh9lp",
-    "emp_id": "emp007",
-    "emp_name": "濱口 夏野",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-08-30 23:53:16"
   }
 ]
