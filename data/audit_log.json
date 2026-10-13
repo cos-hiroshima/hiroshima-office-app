@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1791932789924iac7b01c0w",
+    "emp_id": "emp011",
+    "emp_name": "クニサキ 望里",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-10-13 23:06:29"
+  },
+  {
     "id": "id1791886163366gi6f8mq1ob9",
     "emp_id": "emp011",
     "emp_name": "クニサキ 望里",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "中村 綾弥 2026-09/7→客先",
     "created_at": "2026-09-01 01:47:10"
-  },
-  {
-    "id": "id1788227228917vz69rkfzg1o",
-    "emp_id": "emp014",
-    "emp_name": "中村 綾弥",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "中村 綾弥 2026-09/7→在宅",
-    "created_at": "2026-09-01 01:47:08"
   }
 ]
