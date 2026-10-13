@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1791879946549oo5kpq7aa1c",
+    "emp_id": "emp010",
+    "emp_name": "陶山 涼",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "クニサキ 望里 2026-10/19→休日",
+    "created_at": "2026-10-13 08:25:46"
+  },
+  {
     "id": "id1791879932657zok4cdde3gq",
     "emp_id": "emp010",
     "emp_name": "陶山 涼",
@@ -2390,13 +2398,5 @@
     "action": "LOGIN",
     "detail": "ログイン成功",
     "created_at": "2026-08-31 07:20:39"
-  },
-  {
-    "id": "id1788141728744s7yxu8zg6co",
-    "emp_id": "emp010",
-    "emp_name": "陶山 涼",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-08-31 02:02:08"
   }
 ]
