@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1791955608748sm02z8du999",
+    "emp_id": "emp010",
+    "emp_name": "陶山 涼",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-10-14 05:26:48"
+  },
+  {
     "id": "id1791955336756djy0vcjth7b",
     "emp_id": "emp011",
     "emp_name": "クニサキ 望里",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "宗東佑美 2026-09/14→出社",
     "created_at": "2026-09-01 01:53:27"
-  },
-  {
-    "id": "id1788227605330tpd7ee5wg9h",
-    "emp_id": "emp015",
-    "emp_name": "宗東佑美",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "宗東佑美 2026-09/18→出社",
-    "created_at": "2026-09-01 01:53:25"
   }
 ]
