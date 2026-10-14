@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17919552863010py3ckla12sq",
+    "emp_id": "emp011",
+    "emp_name": "クニサキ 望里",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-10-14 05:21:26"
+  },
+  {
     "id": "id1791947421253yo78wgrhao",
     "emp_id": "emp011",
     "emp_name": "クニサキ 望里",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "宗東佑美 2026-09/10→在宅",
     "created_at": "2026-09-01 01:53:15"
-  },
-  {
-    "id": "id1788227594149g2oleins9z",
-    "emp_id": "emp015",
-    "emp_name": "宗東佑美",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "宗東佑美 2026-09/9→出社",
-    "created_at": "2026-09-01 01:53:14"
   }
 ]
