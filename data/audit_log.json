@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1791961705246v5tc1ryxza",
+    "emp_id": "emp006",
+    "emp_name": "藤原 温大",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "藤原 温大 2026-10/29→未入力",
+    "created_at": "2026-10-14 07:08:25"
+  },
+  {
     "id": "id1791961702559uocbzfb4ky",
     "emp_id": "emp006",
     "emp_name": "藤原 温大",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "宗東佑美 2026-09/16→出社",
     "created_at": "2026-09-01 05:16:23"
-  },
-  {
-    "id": "id1788239764854b2vfuux2w1s",
-    "emp_id": "emp015",
-    "emp_name": "宗東佑美",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "宗東佑美 2026-09/3→出社",
-    "created_at": "2026-09-01 05:16:04"
   }
 ]
