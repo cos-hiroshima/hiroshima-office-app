@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1792454311990l02rwnc37em",
+    "emp_id": "emp007",
+    "emp_name": "濱口 夏野",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-10-19 23:58:31"
+  },
+  {
     "id": "id1792399338651hz1yqlgz56",
     "emp_id": "emp002",
     "emp_name": "山下 栞奈",
@@ -2390,13 +2398,5 @@
     "action": "ADD_KEY",
     "detail": "入口③（広島）",
     "created_at": "2026-09-04 02:24:57"
-  },
-  {
-    "id": "id178848855289626yudn3i56l",
-    "emp_id": "emp011",
-    "emp_name": "クニサキ 望里",
-    "action": "EDIT_KEY",
-    "detail": "入口②（広島）",
-    "created_at": "2026-09-04 02:22:32"
   }
 ]
