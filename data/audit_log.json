@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1792392617616be1q8xcs29n",
+    "emp_id": "emp007",
+    "emp_name": "濱口 夏野",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "濱口 夏野 2026-12/7→休日",
+    "created_at": "2026-10-19 06:50:17"
+  },
+  {
     "id": "id17923926070269m7b9m7e8bm",
     "emp_id": "emp007",
     "emp_name": "濱口 夏野",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_KEY",
     "detail": "入口①（広島）",
     "created_at": "2026-09-04 02:12:09"
-  },
-  {
-    "id": "id1788487917992utaoxcnafil",
-    "emp_id": "emp011",
-    "emp_name": "クニサキ 望里",
-    "action": "ADD_KEY",
-    "detail": "入口②（広島）",
-    "created_at": "2026-09-04 02:11:57"
   }
 ]
