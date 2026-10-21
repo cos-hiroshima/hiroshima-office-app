@@ -156,13 +156,13 @@
   {
     "id": "id1792562489547a0q65c9m50w",
     "date": "2026-10-21",
-    "manager_id": null,
+    "manager_id": "emp006",
     "key_number": "T25562097",
     "location": "",
     "note": "事務所カードキー",
     "active": 1,
     "created_at": "2026-10-21 06:01:29",
-    "updated_at": "2026-10-21 06:01:29"
+    "updated_at": "2026-10-21 06:05:37"
   },
   {
     "id": "id1792562529862b7j27ydy4k5",
