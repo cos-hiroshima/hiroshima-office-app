@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1792551501550ba69u1mhmv",
+    "emp_id": "emp014",
+    "emp_name": "中村 綾弥",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-10-21 02:58:21"
+  },
+  {
     "id": "id17925513092783zm3d69bwin",
     "emp_id": "emp014",
     "emp_name": "中村 綾弥",
@@ -2390,13 +2398,5 @@
     "action": "ADD_KEY",
     "detail": "入口⑧（広島）",
     "created_at": "2026-09-04 02:31:49"
-  },
-  {
-    "id": "id1788489036822s60g77e3wl",
-    "emp_id": "emp011",
-    "emp_name": "クニサキ 望里",
-    "action": "EDIT_KEY",
-    "detail": "入口④（広島）*マスター",
-    "created_at": "2026-09-04 02:30:36"
   }
 ]
