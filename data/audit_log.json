@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1792553803082hzlbkt6t4sm",
+    "emp_id": "emp014",
+    "emp_name": "中村 綾弥",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-10-21 03:36:43"
+  },
+  {
     "id": "id17925527238863toei06nl46",
     "emp_id": "emp011",
     "emp_name": "クニサキ 望里",
@@ -2390,13 +2398,5 @@
     "action": "LOGIN",
     "detail": "ログイン成功",
     "created_at": "2026-09-04 02:33:22"
-  },
-  {
-    "id": "id1788489186789ar28qhl3tmc",
-    "emp_id": "emp011",
-    "emp_name": "クニサキ 望里",
-    "action": "ADD_KEY",
-    "detail": "入口⑦（広島）",
-    "created_at": "2026-09-04 02:33:06"
   }
 ]
