@@ -134,13 +134,13 @@
   {
     "id": "id1792562406301uhgxx3al339",
     "date": "2026-10-21",
-    "manager_id": null,
+    "manager_id": "emp015",
     "key_number": "T23589321",
     "location": "",
     "note": "事務所カードキー",
     "active": 1,
     "created_at": "2026-10-21 06:00:06",
-    "updated_at": "2026-10-21 06:00:06"
+    "updated_at": "2026-10-21 06:04:14"
   },
   {
     "id": "id1792562447018gdl7acjwh5k",
