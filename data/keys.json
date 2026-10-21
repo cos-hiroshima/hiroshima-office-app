@@ -163,5 +163,16 @@
     "active": 1,
     "created_at": "2026-10-21 06:01:29",
     "updated_at": "2026-10-21 06:01:29"
+  },
+  {
+    "id": "id1792562529862b7j27ydy4k5",
+    "date": "2026-10-21",
+    "manager_id": null,
+    "key_number": "T25562098",
+    "location": "",
+    "note": "事務所カードキー",
+    "active": 1,
+    "created_at": "2026-10-21 06:02:09",
+    "updated_at": "2026-10-21 06:02:09"
   }
 ]
