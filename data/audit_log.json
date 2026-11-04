@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1793751214155lcf2d5avfg",
+    "emp_id": "emp013",
+    "emp_name": "永久 寛基",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "永久 寛基 2026-11/2→出社",
+    "created_at": "2026-11-04 00:13:34"
+  },
+  {
     "id": "id17937512063660in6snr451eq",
     "emp_id": "emp013",
     "emp_name": "永久 寛基",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "藤原 温大 2026-10/23→出社",
     "created_at": "2026-10-05 02:05:37"
-  },
-  {
-    "id": "id1791165934861s5falbsc3lo",
-    "emp_id": "emp006",
-    "emp_name": "藤原 温大",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "藤原 温大 2026-10/19→出社",
-    "created_at": "2026-10-05 02:05:34"
   }
 ]
