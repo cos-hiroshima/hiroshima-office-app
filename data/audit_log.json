@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1793852803165i50abzbdp1o",
+    "emp_id": "emp014",
+    "emp_name": "中村 綾弥",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-11-05 04:26:43"
+  },
+  {
     "id": "id1793852600110yzolwx2l9im",
     "emp_id": "emp006",
     "emp_name": "藤原 温大",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "藤原 温大 2026-10/30→出社",
     "created_at": "2026-10-08 00:13:58"
-  },
-  {
-    "id": "id17914184096088on4cuawx95",
-    "emp_id": "emp006",
-    "emp_name": "藤原 温大",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "森口 祥子 2026-10/12→在宅",
-    "created_at": "2026-10-08 00:13:29"
   }
 ]
