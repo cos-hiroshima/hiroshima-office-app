@@ -183,5 +183,23 @@
     "updated_at": "2026-09-01 00:55:59",
     "has_password": 0,
     "last_login": null
+  },
+  {
+    "id": "emp016",
+    "name": "岡本光太郎",
+    "name_kana": "オカモトコウタロウ",
+    "emp_type": "社員",
+    "status": "在籍",
+    "role": "admin",
+    "email": "",
+    "remote_ok": 1,
+    "client_site": 0,
+    "join_date": "",
+    "project_id": "id1783046921267wokrwpzxbjo",
+    "note": "",
+    "created_at": "2026-11-05 02:13:41",
+    "updated_at": "2026-11-05 02:13:41",
+    "has_password": 0,
+    "last_login": null
   }
 ]
