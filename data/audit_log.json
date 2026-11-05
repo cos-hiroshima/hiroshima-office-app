@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1793845145251hej1ywm1quc",
+    "emp_id": "emp016",
+    "emp_name": "",
+    "action": "SETUP_PASSWORD",
+    "detail": "初回パスワード設定",
+    "created_at": "2026-11-05 02:19:05"
+  },
+  {
     "id": "id1793845139878xd7eyvc7qw",
     "emp_id": "emp016",
     "emp_name": "",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "藤原 温大 2026-10/9→客先",
     "created_at": "2026-10-07 08:03:22"
-  },
-  {
-    "id": "id1791360200966ar3j5sx5got",
-    "emp_id": "emp006",
-    "emp_name": "藤原 温大",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "藤原 温大 2026-10/9→有休",
-    "created_at": "2026-10-07 08:03:20"
   }
 ]
