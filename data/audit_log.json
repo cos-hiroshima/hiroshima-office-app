@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1793838546211d8znd58u7tn",
+    "emp_id": "emp006",
+    "emp_name": "藤原 温大",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-11-05 00:29:06"
+  },
+  {
     "id": "id1793837059657p7hciei4e7o",
     "emp_id": "emp010",
     "emp_name": "陶山 涼",
@@ -2390,13 +2398,5 @@
     "action": "LOGIN",
     "detail": "ログイン成功",
     "created_at": "2026-10-07 05:35:49"
-  },
-  {
-    "id": "id17913308997160f6wc7pqf4e9",
-    "emp_id": "emp007",
-    "emp_name": "濱口 夏野",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-10-06 23:54:59"
   }
 ]
