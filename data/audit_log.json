@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1794284786955uvb79tpmbvl",
+    "emp_id": "emp001",
+    "emp_name": "西浦 靖裕",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "中村 綾弥 2026-11/21→出社",
+    "created_at": "2026-11-10 04:26:26"
+  },
+  {
     "id": "id17942847293615t9mibul54",
     "emp_id": "emp001",
     "emp_name": "西浦 靖裕",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "陶山 涼 2026-10/26→出社",
     "created_at": "2026-10-13 08:26:05"
-  },
-  {
-    "id": "id1791879961127azl9qqiry38",
-    "emp_id": "emp010",
-    "emp_name": "陶山 涼",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "陶山 涼 2026-10/19→休日",
-    "created_at": "2026-10-13 08:26:01"
   }
 ]
