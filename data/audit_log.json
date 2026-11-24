@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1795487575159oz6gxq9rgrl",
+    "emp_id": "emp015",
+    "emp_name": "宗東佑美",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "宗東佑美 2026-12/24→出社",
+    "created_at": "2026-11-24 02:32:55"
+  },
+  {
     "id": "id1795487569809q8m270zckej",
     "emp_id": "emp015",
     "emp_name": "宗東佑美",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "山下 栞奈 2026-10/19→休日",
     "created_at": "2026-10-19 04:55:36"
-  },
-  {
-    "id": "id1792385727261c8ursszw83",
-    "emp_id": "emp002",
-    "emp_name": "山下 栞奈",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-10-19 04:55:27"
   }
 ]
