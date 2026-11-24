@@ -1,5 +1,13 @@
 [
   {
+    "id": "id1795487685420dfwdniqi8t",
+    "emp_id": "emp015",
+    "emp_name": "宗東佑美",
+    "action": "EDIT_ATTENDANCE",
+    "detail": "宗東佑美 2026-12/4→未入力",
+    "created_at": "2026-11-24 02:34:45"
+  },
+  {
     "id": "id1795487682264k9ox8s2cq7h",
     "emp_id": "emp015",
     "emp_name": "宗東佑美",
@@ -2390,13 +2398,5 @@
     "action": "EDIT_ATTENDANCE",
     "detail": "濱口 夏野 2026-12/7→客先",
     "created_at": "2026-10-19 06:49:25"
-  },
-  {
-    "id": "id179239256165518tcl4no7co",
-    "emp_id": "emp007",
-    "emp_name": "濱口 夏野",
-    "action": "EDIT_ATTENDANCE",
-    "detail": "濱口 夏野 2026-12/7→在宅",
-    "created_at": "2026-10-19 06:49:21"
   }
 ]
