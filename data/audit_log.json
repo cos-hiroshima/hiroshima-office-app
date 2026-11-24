@@ -1,5 +1,13 @@
 [
   {
+    "id": "id179556409590906zwmsvtc7j5",
+    "emp_id": "emp002",
+    "emp_name": "山下 栞奈",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-11-24 23:48:15"
+  },
+  {
     "id": "id1795562865487pad76dar4g",
     "emp_id": "emp015",
     "emp_name": "宗東佑美",
@@ -2390,13 +2398,5 @@
     "action": "LOGIN",
     "detail": "ログイン成功",
     "created_at": "2026-10-20 03:57:24"
-  },
-  {
-    "id": "id1792454311990l02rwnc37em",
-    "emp_id": "emp007",
-    "emp_name": "濱口 夏野",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-10-19 23:58:31"
   }
 ]
