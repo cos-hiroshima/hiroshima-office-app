@@ -1,5 +1,13 @@
 [
   {
+    "id": "id17957515568604ch0ov8r0ah",
+    "emp_id": "emp013",
+    "emp_name": "永久 寛基",
+    "action": "LOGIN",
+    "detail": "ログイン成功",
+    "created_at": "2026-11-27 03:52:36"
+  },
+  {
     "id": "id1795740527567w7cyp9h4mms",
     "emp_id": "emp010",
     "emp_name": "陶山 涼",
@@ -2390,13 +2398,5 @@
     "action": "ADD_KEY",
     "detail": "T23589318",
     "created_at": "2026-10-21 05:49:16"
-  },
-  {
-    "id": "id1792560885987ie44ppcw7fr",
-    "emp_id": "emp011",
-    "emp_name": "クニサキ 望里",
-    "action": "LOGIN",
-    "detail": "ログイン成功",
-    "created_at": "2026-10-21 05:34:45"
   }
 ]
